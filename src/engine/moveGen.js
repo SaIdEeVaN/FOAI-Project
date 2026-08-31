@@ -140,6 +140,7 @@ export class MoveGenerator {
 
   _isEnemy(piece, color) {
     if (piece === '.') return false;
+    if (piece.toLowerCase() === 'k') return false; // Kings cannot be captured
     return color === 'w' ? piece === piece.toLowerCase() : piece === piece.toUpperCase();
   }
 
@@ -152,7 +153,7 @@ export class MoveGenerator {
 
   isSquareAttacked(sq, attackingColor) {
     // Pawn attacks
-    const pawnDir = attackingColor === 'b' ? -8 : 8;
+    const pawnDir = attackingColor === 'b' ? 8 : -8;
     for (const off of [-1, 1]) {
       if ((sq % 8 === 0 && off === -1) || (sq % 8 === 7 && off === 1)) continue;
       const t = sq - pawnDir + off;

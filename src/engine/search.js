@@ -40,6 +40,13 @@ export class SearchEngine {
     return { bestMove, depth: this.maxDepth, nodes: this.nodes, score: finalScore };
   }
 
+  _checkTime() {
+    this.nodes++;
+    if ((this.nodes & 2047) === 0 && Date.now() - this.startTime >= this.timeLimitMs) {
+      this.abort = true;
+    }
+  }
+
   _root(depth, alpha, beta) {
     const gen = new MoveGenerator(this.board);
     const moves = gen.generateLegalMoves();
@@ -62,10 +69,7 @@ export class SearchEngine {
   }
 
   _negamax(depth, alpha, beta) {
-    this.nodes++;
-    if (this.nodes % 2048 === 0 && Date.now() - this.startTime >= this.timeLimitMs) {
-      this.abort = true; return 0;
-    }
+    this._checkTime();
     if (this.abort) return 0;
 
     const hk = this.tt.computeHash(this.board);
@@ -99,7 +103,7 @@ export class SearchEngine {
   }
 
   _quiescence(alpha, beta) {
-    this.nodes++;
+    this._checkTime();
     if (this.abort) return 0;
     const raw = this.evaluator.evaluate(this.board);
     const standPat = this.board.sideToMove === 'w' ? raw : -raw;
