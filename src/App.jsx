@@ -258,15 +258,39 @@ export default function App() {
             {engineThinking && <span className="thinking-badge">thinking…</span>}
           </div>
 
-          <ChessBoard
-            squares={squares}
-            selectedSq={selectedSq}
-            legalTargets={legalTargets}
-            lastMove={lastMove}
-            checkSq={kingSq}
-            onSquareClick={onSquareClick}
-            flip={playerColor === 'b'}
-          />
+          <div className="board-wrap">
+            <div className="eval-bar-vertical">
+              {(() => {
+                const clamped = Math.max(-800, Math.min(800, evalScore));
+                const whitePct = Math.round(50 + (clamped / 800) * 50);
+                const isWhiteAdv = evalScore >= 0;
+                const scoreText = (evalScore / 100).toFixed(1);
+                
+                return (
+                  <>
+                    <div className="eval-fill-black" style={{ height: `${100 - whitePct}%` }}>
+                      {!isWhiteAdv && <span className="eval-text-black">{Math.abs(scoreText)}</span>}
+                    </div>
+                    <div className="eval-fill-white" style={{ height: `${whitePct}%` }}>
+                      {isWhiteAdv && <span className="eval-text-white">{Math.abs(scoreText)}</span>}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+            
+            <div className="board-container">
+              <ChessBoard
+                squares={squares}
+                selectedSq={selectedSq}
+                legalTargets={legalTargets}
+                lastMove={lastMove}
+                checkSq={kingSq}
+                onSquareClick={onSquareClick}
+                flip={playerColor === 'b'}
+              />
+            </div>
+          </div>
 
           <div className="player-tag bottom">
             <span className={`player-dot ${playerColor === 'w' ? 'white' : 'black'}`} />

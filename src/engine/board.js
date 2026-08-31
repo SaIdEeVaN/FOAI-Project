@@ -134,7 +134,7 @@ export class Board {
     this.squares[move.targetSq] = move.pieceCaptured;
 
     if (move.isEnPassant) {
-      const capSq = move.targetSq + (this.sideToMove === 'w' ? -8 : 8);
+      const capSq = move.targetSq + (this.sideToMove === 'w' ? 8 : -8);
       this.squares[capSq] = this.sideToMove === 'w' ? 'p' : 'P';
       this.squares[move.targetSq] = '.';
     }

@@ -147,7 +147,51 @@ html, body, #root {
 /* ── Board wrap ───────────────────────────────────────────────────────── */
 .board-wrap {
   display: flex;
-  gap: 4px;
+  gap: 12px;
+  align-items: stretch;
+}
+.eval-bar-vertical {
+  width: 16px;
+  background: var(--surface2);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.eval-fill-black {
+  background: #312E2B;
+  width: 100%;
+  transition: height 0.4s ease;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+}
+.eval-fill-white {
+  background: #FFFFFF;
+  width: 100%;
+  transition: height 0.4s ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+.eval-text-black {
+  color: #FFFFFF;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+.eval-text-white {
+  color: #312E2B;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+.board-container {
+  display: flex;
+  flex-direction: column;
 }
 .coord-ranks {
   display: flex;

@@ -12,19 +12,6 @@ export default function EngineConsole({ telemetry, logLines, evalScore, thinking
         {thinking && <span className="thinking-pill">searching…</span>}
       </div>
 
-      {/* Eval bar */}
-      <div className="eval-section">
-        <div className="eval-bar-track">
-          <div className="eval-bar-white" style={{ width: `${whitePct}%` }} />
-          <div className="eval-bar-black" style={{ width: `${blackPct}%` }} />
-        </div>
-        <div className="eval-labels">
-          <span>White</span>
-          <span className="eval-score">{scoreStr}</span>
-          <span>Black</span>
-        </div>
-      </div>
-
       {/* Telemetry grid */}
       {telemetry && (
         <div className="tele-grid">
