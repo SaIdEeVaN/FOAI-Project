@@ -41,6 +41,7 @@ export class Evaluation {
     score -= this._pawnStructure(bPawns);
     score += this._kingSafety(wKingSq, wPawns, bPawns, 'w');
     score -= this._kingSafety(bKingSq, bPawns, wPawns, 'b');
+    score += this._evaluateMobility(board);
     return score; // Positive = White winning
   }
 
@@ -68,9 +69,52 @@ export class Evaluation {
     if (kf <= 2 || kf >= 5) {
       const dir = color === 'w' ? -8 : 8;
       for (const shieldSq of [kingSq + dir - 1, kingSq + dir, kingSq + dir + 1]) {
-        if (shieldSq >= 0 && shieldSq < 64 && ownPawns.includes(shieldSq)) s += 10;
+        if (shieldSq >= 0 && shieldSq < 64 && Math.abs((shieldSq % 8) - kf) <= 1 && ownPawns.includes(shieldSq)) s += 10;
       }
     }
     return s;
+  }
+
+  _evaluateMobility(board) {
+    let mobilityScore = 0;
+    for (let sq = 0; sq < 64; sq++) {
+      const piece = board.squares[sq];
+      if (piece === '.') continue;
+      if (piece.toLowerCase() === 'n') {
+        const moves = this._knightMobility(sq);
+        mobilityScore += (piece === 'N' ? moves * 2 : -moves * 2);
+      } else if (piece.toLowerCase() === 'b') {
+        const moves = this._bishopMobility(board, sq);
+        mobilityScore += (piece === 'B' ? moves * 2 : -moves * 2);
+      }
+    }
+    return mobilityScore;
+  }
+
+  _knightMobility(sq) {
+    const offsets = [-17, -15, -10, -6, 6, 10, 15, 17];
+    let count = 0;
+    for (const offset of offsets) {
+      const target = sq + offset;
+      if (target >= 0 && target < 64 && Math.abs((sq % 8) - (target % 8)) <= 2) count++;
+    }
+    return count;
+  }
+
+  _bishopMobility(board, sq) {
+    const directions = [-9, -7, 7, 9];
+    let count = 0;
+    for (const dir of directions) {
+      for (let step = 1; step < 8; step++) {
+        const target = sq + dir * step;
+        if (target < 0 || target >= 64) break;
+        const prevFile = (target - dir) % 8;
+        const currFile = target % 8;
+        if (Math.abs(currFile - prevFile) > 1) break;
+        count++;
+        if (board.squares[target] !== '.') break;
+      }
+    }
+    return count;
   }
 }
