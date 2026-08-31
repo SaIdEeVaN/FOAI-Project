@@ -41,6 +41,7 @@ export default function App() {
   const [logLines, setLogLines]   = useState([]);
   const [evalScore, setEvalScore] = useState(0);
   const [playerColor, setPlayerColor] = useState('w');
+  const [pendingPromotion, setPendingPromotion] = useState(null); // { from, to, color }
   const workerRef = useRef(null);
   const boardRef  = useRef(board);
 
@@ -106,14 +107,36 @@ export default function App() {
   const commitPlayerMove = (from, to) => {
     const gen = new MoveGenerator(boardRef.current);
     const legal = gen.generateLegalMoves();
-    // Handle promotion — default to queen
-    let move = legal.find(m => m.startSq === from && m.targetSq === to && (m.promotionPiece === '.' || m.promotionPiece.toLowerCase() === 'q'));
+    
+    // Check if this move is a promotion
+    const isPromotion = legal.some(m => m.startSq === from && m.targetSq === to && m.promotionPiece !== '.');
+    if (isPromotion) {
+      setPendingPromotion({ from, to, color: boardRef.current.sideToMove });
+      return;
+    }
+
+    let move = legal.find(m => m.startSq === from && m.targetSq === to);
     if (!move) return;
 
+    _executeMove(move);
+  };
+
+  const commitPromotion = (promotionPiece) => {
+    const gen = new MoveGenerator(boardRef.current);
+    const legal = gen.generateLegalMoves();
+    let move = legal.find(m => m.startSq === pendingPromotion.from && m.targetSq === pendingPromotion.to && m.promotionPiece.toLowerCase() === promotionPiece.toLowerCase());
+    
+    setPendingPromotion(null);
+    if (!move) return;
+
+    _executeMove(move);
+  };
+
+  const _executeMove = (move) => {
     boardRef.current.makeMove(move);
     setSelectedSq(null);
     setLegalTargets([]);
-    setLastMove({ from, to });
+    setLastMove({ from: move.startSq, to: move.targetSq });
     setMoveHistory(prev => [...prev, move.toUci()]);
     syncState();
 
@@ -285,6 +308,29 @@ export default function App() {
               {gameEnd.type === 'checkmate' ? 'by Checkmate' : `by ${gameEnd.reason}`}
             </p>
             <button className="btn btn-primary" onClick={newGame}>Play Again</button>
+          </div>
+        </div>
+      )}
+
+      {/* Promotion Modal */}
+      {pendingPromotion && (
+        <div className="overlay promotion-overlay">
+          <div className="promotion-card">
+            <h3 className="promotion-title">Promote Pawn</h3>
+            <div className="promotion-options">
+              {['q', 'r', 'n', 'b'].map(p => {
+                const piece = pendingPromotion.color === 'w' ? p.toUpperCase() : p;
+                const PIECE_UNICODE = { Q:'♛', R:'♜', B:'♝', N:'♞', q:'♛', r:'♜', b:'♝', n:'♞' };
+                return (
+                  <button key={p} className="promotion-btn" onClick={() => commitPromotion(p)}>
+                    <span className={`piece ${pendingPromotion.color === 'w' ? 'white-piece' : 'black-piece'}`}>
+                      {PIECE_UNICODE[piece]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button className="btn btn-ghost" onClick={() => { setPendingPromotion(null); setSelectedSq(null); setLegalTargets([]); }}>Cancel</button>
           </div>
         </div>
       )}
