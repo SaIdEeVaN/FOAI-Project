@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FOAI Chess Engine — AI Chess Interface</title>
+  <meta name="description" content="An interactive chess engine built with Minimax, Alpha-Beta Pruning, and Iterative Deepening for the Foundations of AI course project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-wrapper">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">♟</span>
+          <div>
+            <h1 class="logo-title">FOAI Chess Engine</h1>
+            <p class="logo-sub">Foundations of Artificial Intelligence — Project</p>
+          </div>
+        </div>
+        <div class="header-badges">
+          <span class="badge">Minimax</span>
+          <span class="badge">Alpha-Beta</span>
+          <span class="badge">Iterative Deepening</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <main class="main-layout">
+
+      <!-- LEFT PANEL — board + controls -->
+      <section class="left-panel">
+
+        <!-- Game Mode Selector -->
+        <div class="mode-bar">
+          <button class="mode-btn active" id="modeHuman" onclick="setMode('human')">
+            👤 Play vs AI
+          </button>
+          <button class="mode-btn" id="modeAI" onclick="setMode('ai')">
+            🤖 Watch AI vs AI
+          </button>
+        </div>
+
+        <!-- Status banner -->
+        <div class="status-banner" id="statusBanner">
+          <span id="statusText">White to move — Your turn!</span>
+        </div>
+
+        <!-- Chess Board -->
+        <div class="board-container">
+          <div class="board-coords-rank" id="rankLabels"></div>
+          <div class="board-wrap">
+            <div class="chess-board" id="chessBoard"></div>
+          </div>
+          <div class="board-coords-file" id="fileLabels"></div>
+        </div>
+
+        <!-- Board Controls -->
+        <div class="board-controls">
+          <button class="ctrl-btn danger" id="btnNewGame" onclick="newGame()">
+            ⟳ New Game
+          </button>
+          <button class="ctrl-btn" id="btnUndo" onclick="undoMove()">
+            ← Undo
+          </button>
+          <button class="ctrl-btn accent" id="btnEngineMove" onclick="requestEngineMove()">
+            ⚡ Engine Move
+          </button>
+        </div>
+
+        <!-- Move History -->
+        <div class="move-history-panel">
+          <h3 class="panel-title">📜 Move History</h3>
+          <div class="move-history-grid" id="moveHistory">
+            <p class="muted-text">No moves yet…</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT PANEL — telemetry + info -->
+      <section class="right-panel">
+
+        <!-- Engine Telemetry -->
+        <div class="telemetry-panel">
+          <h3 class="panel-title">
+            <span class="pulse-dot" id="engineDot"></span>
+            Engine Console
+          </h3>
+          <div class="telemetry-grid">
+            <div class="tele-card">
+              <p class="tele-label">Best Move</p>
+              <p class="tele-value accent-text" id="teleBestMove">—</p>
+            </div>
+            <div class="tele-card">
+              <p class="tele-label">Depth Reached</p>
+              <p class="tele-value" id="teleDepth">—</p>
+            </div>
+            <div class="tele-card">
+              <p class="tele-label">Nodes Expanded</p>
+              <p class="tele-value" id="teleNodes">—</p>
+            </div>
+            <div class="tele-card">
+              <p class="tele-label">Evaluation Score</p>
+              <p class="tele-value" id="teleEval">—</p>
+            </div>
+            <div class="tele-card">
+              <p class="tele-label">Move Number</p>
+              <p class="tele-value" id="teleMoveNum">—</p>
+            </div>
+            <div class="tele-card">
+              <p class="tele-label">Half-Move Clock</p>
+              <p class="tele-value" id="teleHalfMove">—</p>
+            </div>
+          </div>
+
+          <!-- Eval Bar -->
+          <div class="eval-bar-container">
+            <p class="tele-label" style="margin-bottom:6px;">Positional Advantage</p>
+            <div class="eval-bar-track">
+              <div class="eval-bar-white" id="evalBarWhite"></div>
+              <div class="eval-bar-black" id="evalBarBlack"></div>
+            </div>
+            <div class="eval-bar-labels">
+              <span>White</span>
+              <span>Black</span>
+            </div>
+          </div>
+
+          <!-- Engine Log -->
+          <div class="engine-log-box">
+            <p class="tele-label" style="margin-bottom:8px;">Search Log</p>
+            <div class="engine-log" id="engineLog">
+              <p class="log-line muted-text">Awaiting first engine move…</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Algorithm Info Cards -->
+        <div class="algo-info-panel">
+          <h3 class="panel-title">🧠 Algorithms Used</h3>
+          <div class="algo-cards">
+            <div class="algo-card">
+              <span class="algo-icon">🌳</span>
+              <div>
+                <p class="algo-name">Minimax / Negamax</p>
+                <p class="algo-desc">Searches all possible moves up to a set depth to find the best outcome.</p>
+              </div>
+            </div>
+            <div class="algo-card">
+              <span class="algo-icon">✂️</span>
+              <div>
+                <p class="algo-name">Alpha-Beta Pruning</p>
+                <p class="algo-desc">Cuts branches that cannot influence the final decision, doubling search efficiency.</p>
+              </div>
+            </div>
+            <div class="algo-card">
+              <span class="algo-icon">🔁</span>
+              <div>
+                <p class="algo-name">Iterative Deepening</p>
+                <p class="algo-desc">Searches increasing depths within a time limit, always returning the best found move.</p>
+              </div>
+            </div>
+            <div class="algo-card">
+              <span class="algo-icon">⚡</span>
+              <div>
+                <p class="algo-name">Quiescence Search</p>
+                <p class="algo-desc">Extends search past the horizon during captures to avoid evaluation errors.</p>
+              </div>
+            </div>
+            <div class="algo-card">
+              <span class="algo-icon">🗂️</span>
+              <div>
+                <p class="algo-name">Transposition Table</p>
+                <p class="algo-desc">Zobrist hashing caches previously seen positions to avoid redundant computation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Game-Over Overlay -->
+    <div class="overlay hidden" id="gameOverOverlay">
+      <div class="overlay-card">
+        <span class="overlay-icon" id="overlayIcon">♚</span>
+        <h2 class="overlay-title" id="overlayTitle">Checkmate!</h2>
+        <p class="overlay-sub" id="overlayMsg">White wins.</p>
+        <button class="ctrl-btn accent" onclick="newGame()">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="spinner-overlay hidden" id="spinnerOverlay">
+      <div class="spinner"></div>
+      <p class="spinner-text">Engine is thinking…</p>
+    </div>
+
+  </div>
+
+</body>
+</html>
