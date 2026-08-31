@@ -1,0 +1,5 @@
+{
+  "projects": {
+    "default": "foai-chess-engine"
+  }
+}
