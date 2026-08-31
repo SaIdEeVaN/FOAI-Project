@@ -10,17 +10,22 @@ const PIECE_UNICODE = {
 const FILES = ['a','b','c','d','e','f','g','h'];
 const RANKS = ['8','7','6','5','4','3','2','1'];
 
-export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove, checkSq, onSquareClick }) {
+export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove, checkSq, onSquareClick, flip = false }) {
+  const displayRanks = flip ? [...RANKS].reverse() : RANKS;
+  const displayFiles = flip ? [...FILES].reverse() : FILES;
+
   return (
     <div className="board-wrap">
       {/* Rank labels left */}
       <div className="coord-ranks">
-        {RANKS.map(r => <span key={r} className="coord-label">{r}</span>)}
+        {displayRanks.map(r => <span key={r} className="coord-label">{r}</span>)}
       </div>
 
       <div className="board-inner">
         <div className="board-grid">
-          {squares.map((piece, sq) => {
+          {Array.from({ length: 64 }).map((_, i) => {
+            const sq = flip ? 63 - i : i;
+            const piece = squares[sq];
             const rank = Math.floor(sq / 8);
             const file = sq % 8;
             const isLight = (rank + file) % 2 === 0;
@@ -54,7 +59,7 @@ export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove
 
         {/* File labels bottom */}
         <div className="coord-files">
-          {FILES.map(f => <span key={f} className="coord-label">{f}</span>)}
+          {displayFiles.map(f => <span key={f} className="coord-label">{f}</span>)}
         </div>
       </div>
     </div>

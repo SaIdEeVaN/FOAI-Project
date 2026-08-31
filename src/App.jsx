@@ -40,7 +40,7 @@ export default function App() {
   const [telemetry, setTelemetry] = useState(null);
   const [logLines, setLogLines]   = useState([]);
   const [evalScore, setEvalScore] = useState(0);
-  const [playerColor] = useState('w'); // Player always plays White
+  const [playerColor, setPlayerColor] = useState('w');
   const workerRef = useRef(null);
   const boardRef  = useRef(board);
 
@@ -119,18 +119,22 @@ export default function App() {
 
     const end = detectGameEnd(boardRef.current);
     if (end) { setGameEnd(end); return; }
-
-    // Trigger engine
-    requestEngine();
   };
 
-  const requestEngine = () => {
+  const requestEngine = useCallback(() => {
     setEngineThinking(true);
     workerRef.current.postMessage({
       type: 'search',
       payload: { boardState: boardRef.current.serialize(), timeLimitMs: 2000 },
     });
-  };
+  }, []);
+
+  // Auto-trigger engine if it's its turn
+  useEffect(() => {
+    if (!gameEnd && !engineThinking && sideToMove !== playerColor) {
+      requestEngine();
+    }
+  }, [sideToMove, playerColor, gameEnd, engineThinking, requestEngine]);
 
   const applyEngineResult = (payload) => {
     setEngineThinking(false);
@@ -226,8 +230,8 @@ export default function App() {
         {/* Left — board */}
         <section className="board-section">
           <div className="player-tag top">
-            <span className="player-dot black" />
-            <span>Engine (Black)</span>
+            <span className={`player-dot ${playerColor === 'w' ? 'black' : 'white'}`} />
+            <span>Engine ({playerColor === 'w' ? 'Black' : 'White'})</span>
             {engineThinking && <span className="thinking-badge">thinking…</span>}
           </div>
 
@@ -238,12 +242,13 @@ export default function App() {
             lastMove={lastMove}
             checkSq={kingSq}
             onSquareClick={onSquareClick}
+            flip={playerColor === 'b'}
           />
 
           <div className="player-tag bottom">
-            <span className="player-dot white" />
-            <span>You (White)</span>
-            <span className={`status-badge ${gameEnd ? 'ended' : sideToMove === 'w' ? 'active' : ''}`}>
+            <span className={`player-dot ${playerColor === 'w' ? 'white' : 'black'}`} />
+            <span>You ({playerColor === 'w' ? 'White' : 'Black'})</span>
+            <span className={`status-badge ${gameEnd ? 'ended' : sideToMove === playerColor ? 'active' : ''}`}>
               {statusText}
             </span>
           </div>
@@ -251,8 +256,8 @@ export default function App() {
           <div className="controls">
             <button className="btn btn-ghost" onClick={newGame}>New Game</button>
             <button className="btn btn-ghost" onClick={undoMove} disabled={engineThinking || !moveHistory.length}>Undo</button>
-            <button className="btn btn-primary" onClick={requestEngine} disabled={engineThinking || gameEnd || sideToMove !== 'b'}>
-              Engine Move
+            <button className="btn btn-primary" onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')} disabled={engineThinking}>
+              Flip Board
             </button>
           </div>
         </section>
