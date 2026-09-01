@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Board } from './engine/board.js';
 import { MoveGenerator } from './engine/moveGen.js';
 import { Move, uciToSq } from './engine/move.js';
@@ -236,7 +237,11 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="header-left">
-          <span className="logo-mark">♟</span>
+          <motion.span
+            className="logo-mark"
+            animate={{ y: [0, -6, 0], rotate: [0, -8, 8, 0] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+          >♟</motion.span>
           <div>
             <h1 className="site-title">FOAI Chess Engine</h1>
             <p className="site-sub">Foundations of Artificial Intelligence</p>
@@ -303,7 +308,12 @@ export default function App() {
           <div className="controls">
             <button className="btn btn-ghost" onClick={newGame}>New Game</button>
             <button className="btn btn-ghost" onClick={undoMove} disabled={engineThinking || !moveHistory.length}>Undo</button>
-            <button className="btn btn-primary" onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')} disabled={engineThinking}>
+            <button
+              className="btn btn-primary"
+              onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')}
+              disabled={engineThinking || (moveHistory.length > 0 && !gameEnd)}
+              title={(moveHistory.length > 0 && !gameEnd) ? 'Flip Board is only available before a game starts or after it ends' : undefined}
+            >
               Flip Board
             </button>
           </div>
@@ -321,43 +331,93 @@ export default function App() {
         </section>
       </main>
 
-      {gameEnd && (
-        <div className="overlay" onClick={newGame}>
-          <div className="overlay-card" onClick={e => e.stopPropagation()}>
-            <p className="overlay-eyebrow">Game Over</p>
-            <h2 className="overlay-title">
-              {gameEnd.type === 'checkmate' ? `${gameEnd.winner} wins` : 'Draw'}
-            </h2>
-            <p className="overlay-reason">
-              {gameEnd.type === 'checkmate' ? 'by Checkmate' : `by ${gameEnd.reason}`}
-            </p>
-            <button className="btn btn-primary" onClick={newGame}>Play Again</button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {gameEnd && (
+          <motion.div
+            className="overlay"
+            onClick={newGame}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <motion.div
+              className="overlay-card"
+              onClick={e => e.stopPropagation()}
+              initial={{ scale: 0.75, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            >
+              <motion.span
+                className="overlay-icon"
+                animate={{ rotate: [0, -15, 15, -10, 10, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+              >
+                {gameEnd.type === 'checkmate' ? '♛' : '½'}
+              </motion.span>
+              <p className="overlay-eyebrow">Game Over</p>
+              <h2 className="overlay-title">
+                {gameEnd.type === 'checkmate' ? `${gameEnd.winner} wins` : 'Draw'}
+              </h2>
+              <p className="overlay-reason">
+                {gameEnd.type === 'checkmate' ? 'by Checkmate' : `by ${gameEnd.reason}`}
+              </p>
+              <button className="btn btn-primary" onClick={newGame}>Play Again</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Promotion Modal */}
-      {pendingPromotion && (
-        <div className="overlay promotion-overlay">
-          <div className="promotion-card">
-            <h3 className="promotion-title">Promote Pawn</h3>
-            <div className="promotion-options">
-              {['q', 'r', 'n', 'b'].map(p => {
-                const piece = pendingPromotion.color === 'w' ? p.toUpperCase() : p;
-                const PIECE_UNICODE = { Q:'♛', R:'♜', B:'♝', N:'♞', q:'♛', r:'♜', b:'♝', n:'♞' };
-                return (
-                  <button key={p} className="promotion-btn" onClick={() => commitPromotion(p)}>
-                    <span className={`piece ${pendingPromotion.color === 'w' ? 'white-piece' : 'black-piece'}`}>
-                      {PIECE_UNICODE[piece]}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <button className="btn btn-ghost" onClick={() => { setPendingPromotion(null); setSelectedSq(null); setLegalTargets([]); }}>Cancel</button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {pendingPromotion && (
+          <motion.div
+            className="overlay promotion-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              className="promotion-card"
+              initial={{ scale: 0.7, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+            >
+              <h3 className="promotion-title">Promote Pawn</h3>
+              <div className="promotion-options">
+                {['q', 'r', 'n', 'b'].map((p, idx) => {
+                  const piece = pendingPromotion.color === 'w' ? p.toUpperCase() : p;
+                  const PIECE_UNICODE = { Q:'♛', R:'♜', B:'♝', N:'♞', q:'♛', r:'♜', b:'♝', n:'♞' };
+                  const isWhitePiece = pendingPromotion.color === 'w';
+                  const pieceStyle = isWhitePiece
+                    ? { color: '#FAFAF8', WebkitTextFillColor: '#FAFAF8', textShadow: '0 0 3px #000, 0 1px 4px rgba(0,0,0,0.85)' }
+                    : { color: '#1A1A18', WebkitTextFillColor: '#1A1A18', textShadow: '0 0 2px rgba(255,255,255,0.25)' };
+                  return (
+                    <motion.button
+                      key={p}
+                      className="promotion-btn"
+                      onClick={() => commitPromotion(p)}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.06, type: 'spring', stiffness: 500, damping: 30 }}
+                      whileHover={{ scale: 1.15, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="piece" style={pieceStyle}>
+                        {PIECE_UNICODE[piece]}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+              <button className="btn btn-ghost" onClick={() => { setPendingPromotion(null); setSelectedSq(null); setLegalTargets([]); }}>Cancel</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
