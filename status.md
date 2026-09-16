@@ -21,5 +21,28 @@
 - [x] Check the screen renders — Node/React server-render smoke test passed (structure, pills, board, breakdown)
 - [x] Update README
 - [x] Commit and push to `main` (`3b30d37`, which also triggers the Firebase deploy workflow)
-- [ ] **Needs a human look:** open <http://localhost:5173> → *Teaching mode* and check the hand-drawn SVG piece
-      silhouettes and the layout; the Chrome extension was not connected, so this was never seen in a browser
+- [x] **Seen in a browser** — both screens were driven in headless Chromium at 1280/768/390px and screenshotted;
+      the SVG silhouettes and the teaching-mode layout render as intended
+
+## Interface pass — one design system, and the white-piece bug
+
+- [x] **Fixed: white pieces rendered black.** `ChessBoard` drew pieces as Unicode glyphs (`♟` et al.) and recoloured
+      them with `color` / `-webkit-text-fill-color`. Those code points have emoji presentation in several system
+      fonts, and a colour font ignores both properties, so the OS painted every "white" piece — pawns most visibly —
+      in the black emoji form. The board now uses the same SVG symbol set teaching mode already used, so the fill is
+      ours. Verified in Chromium: white computes to `rgb(248, 247, 243)`, black to `rgb(31, 30, 27)`
+- [x] Every other piece follows the same path: promotion dialog, game-over icon, header mark, captured strip, favicon
+- [x] `index.css` rebuilt as one system — tokens, then primitives both screens share (cards, tiles, wells, micro-labels,
+      mono numerals, bars, pills), then screen specifics. Teaching mode keeps its look and now shares the rules
+- [x] Play screen restyled to match: seats with captured material, in-board coordinates, board-height evaluation bar,
+      stat tiles, sticky move-list header, modals
+- [x] Fixed alongside: status text assumed the player was White; the evaluation sign assumed the engine was Black
+      (both wrong after *Flip board*); `Math.abs` on a formatted string dropped the bar's decimal; the primary button
+      hovered blue against a green accent
+- [x] Keyboard and screen-reader support on the board — squares with pieces or legal targets are focusable and
+      respond to Enter/Space, each labelled like "e2, White pawn"
+- [x] Move list and engine log scroll to the newest entry; `prefers-reduced-motion` honoured
+- [x] Dropped the unused Vite starter files (`main.ts`, `counter.ts`, `style.css`, `public/icons.svg`) and replaced
+      the emoji-glyph favicon with an SVG pawn
+- [x] Checked in Chromium on the production build: play as White and as Black, flipped board and bar, undo,
+      new game, teaching-mode round trip, promotion and game-over dialogs, no horizontal overflow at 390px

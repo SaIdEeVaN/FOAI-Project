@@ -2,15 +2,21 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Board } from './engine/board.js';
 import { MoveGenerator } from './engine/moveGen.js';
-import { Move, uciToSq } from './engine/move.js';
+import { uciToSq } from './engine/move.js';
 import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
 import TeachingMode from './components/TeachingMode.jsx';
-import { PieceSymbols } from './components/PieceSymbols.jsx';
+import { GameOverModal, PromotionModal } from './components/Modals.jsx';
+import { PieceSymbols, Piece, pieceName } from './components/PieceSymbols.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
+
+// What each side starts with, for the captured-material strip.
+const START_COUNTS = { p: 8, n: 2, b: 2, r: 2, q: 1 };
+const PIECE_VALUE  = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+const CAPTURE_ORDER = ['q', 'r', 'b', 'n', 'p'];
 
 function detectGameEnd(board) {
   const gen = new MoveGenerator(board);
@@ -28,6 +34,58 @@ function detectGameEnd(board) {
     return { type: 'checkmate', winner: board.sideToMove === 'w' ? 'Black' : 'White' };
   }
   return { type: 'draw', reason: 'Stalemate' };
+}
+
+// Pieces of `color` that have left the board, most valuable first, plus their total worth.
+function captured(squares, color) {
+  const list = [];
+  let points = 0;
+  for (const type of CAPTURE_ORDER) {
+    const piece = color === 'w' ? type.toUpperCase() : type;
+    const gone = START_COUNTS[type] - squares.filter(p => p === piece).length;
+    for (let i = 0; i < gone; i++) list.push(piece);
+    points += Math.max(0, gone) * PIECE_VALUE[type];
+  }
+  return { list, points };
+}
+
+// ── Evaluation bar ──────────────────────────────────────────────────────────
+function EvalBar({ score, flip }) {
+  const clamped  = Math.max(-800, Math.min(800, score));
+  const whitePct = 50 + (clamped / 800) * 50;
+  const whiteAhead = score >= 0;
+  const label = `${score === 0 ? '0.00' : `${score > 0 ? '+' : '−'}${(Math.abs(score) / 100).toFixed(2)}`} for White`;
+
+  return (
+    <div className={`eval-bar${flip ? ' flipped' : ''}`} role="img" aria-label={`Evaluation ${label}`}>
+      <div className="eval-bar-white" style={{ height: `${whitePct}%` }} />
+      <span className={`eval-bar-score ${whiteAhead ? 'on-white' : 'on-black'}`}>
+        {(Math.abs(score) / 100).toFixed(1)}
+      </span>
+    </div>
+  );
+}
+
+// ── Player seat ─────────────────────────────────────────────────────────────
+function Seat({ name, color, squares, badge }) {
+  // A side's advantage is what it took from the other side, minus what it gave up.
+  const mine  = captured(squares, color === 'w' ? 'b' : 'w');
+  const yours = captured(squares, color);
+  const edge  = mine.points - yours.points;
+
+  return (
+    <div className="seat">
+      <Piece piece={color === 'w' ? 'K' : 'k'} className="seat-pc" />
+      <span className="seat-name">{name}</span>
+      {mine.list.length > 0 && (
+        <span className="seat-taken" aria-label={`Captured: ${mine.list.map(pieceName).join(', ')}`}>
+          {mine.list.map((p, i) => <Piece key={i} piece={p} className="taken-pc" />)}
+          {edge > 0 && <span className="seat-edge">+{edge}</span>}
+        </span>
+      )}
+      {badge}
+    </div>
+  );
 }
 
 export default function App() {
@@ -48,6 +106,10 @@ export default function App() {
   const [view, setView] = useState('play'); // 'play' | 'teach'
   const workerRef = useRef(null);
   const boardRef  = useRef(board);
+
+  // The worker's onmessage closure is installed once, so anything it reads lives in a ref.
+  const playerColorRef = useRef(playerColor);
+  useEffect(() => { playerColorRef.current = playerColor; }, [playerColor]);
 
   // ── Init Web Worker ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -111,7 +173,7 @@ export default function App() {
   const commitPlayerMove = (from, to) => {
     const gen = new MoveGenerator(boardRef.current);
     const legal = gen.generateLegalMoves();
-    
+
     // Check if this move is a promotion
     const isPromotion = legal.some(m => m.startSq === from && m.targetSq === to && m.promotionPiece !== '.');
     if (isPromotion) {
@@ -129,7 +191,7 @@ export default function App() {
     const gen = new MoveGenerator(boardRef.current);
     const legal = gen.generateLegalMoves();
     let move = legal.find(m => m.startSq === pendingPromotion.from && m.targetSq === pendingPromotion.to && m.promotionPiece.toLowerCase() === promotionPiece.toLowerCase());
-    
+
     setPendingPromotion(null);
     if (!move) return;
 
@@ -177,7 +239,8 @@ export default function App() {
     boardRef.current.makeMove(move);
     setLastMove({ from, to });
     setMoveHistory(prev => [...prev, payload.uci]);
-    setEvalScore(-payload.score); // Negate — engine played Black, positive = good for engine = bad for White
+    // The search scores from the mover's point of view; the bar reads from White's.
+    setEvalScore(playerColorRef.current === 'w' ? -payload.score : payload.score);
     setTelemetry({ depth: payload.depth, nodes: payload.nodes, score: payload.score, move: payload.uci });
     syncState();
 
@@ -210,14 +273,13 @@ export default function App() {
     // Simplest approach: reset and replay
     const replayMoves = moveHistory.slice(0, -count);
     boardRef.current.reset();
-    const gen = new MoveGenerator(boardRef.current);
     for (const uci of replayMoves) {
       const legal = new MoveGenerator(boardRef.current).generateLegalMoves();
       const move = legal.find(m => m.toUci() === uci);
       if (move) boardRef.current.makeMove(move);
     }
     setMoveHistory(replayMoves);
-    setLastMove(replayMoves.length >= 2 ? { from: uciToSq(replayMoves.at(-1).slice(0,2)), to: uciToSq(replayMoves.at(-1).slice(2,4)) } : null);
+    setLastMove(replayMoves.length ? { from: uciToSq(replayMoves.at(-1).slice(0,2)), to: uciToSq(replayMoves.at(-1).slice(2,4)) } : null);
     setSelectedSq(null);
     setLegalTargets([]);
     setGameEnd(null);
@@ -225,16 +287,21 @@ export default function App() {
   };
 
   // ── Status text ───────────────────────────────────────────────────────────
-  let statusText = sideToMove === 'w' ? 'Your turn' : 'Engine thinking…';
-  if (engineThinking) statusText = 'Engine thinking…';
+  let statusText;
   if (gameEnd) {
     statusText = gameEnd.type === 'checkmate'
       ? `Checkmate — ${gameEnd.winner} wins`
       : `Draw — ${gameEnd.reason}`;
+  } else if (engineThinking || sideToMove !== playerColor) {
+    statusText = 'Engine thinking…';
+  } else {
+    statusText = 'Your turn';
   }
 
-  const inCheck = !gameEnd && new MoveGenerator(board).isInCheck(sideToMove);
-  const kingSq  = inCheck ? board.squares.findIndex(p => p === (sideToMove === 'w' ? 'K' : 'k')) : -1;
+  const inCheck = !gameEnd && new MoveGenerator(boardRef.current).isInCheck(sideToMove);
+  const kingSq  = inCheck ? boardRef.current.squares.findIndex(p => p === (sideToMove === 'w' ? 'K' : 'k')) : -1;
+  const engineColor = playerColor === 'w' ? 'b' : 'w';
+  const flip = playerColor === 'b';
 
   return (
     <div className="app">
@@ -243,14 +310,17 @@ export default function App() {
         <div className="header-left">
           <motion.span
             className="logo-mark"
-            animate={{ y: [0, -6, 0], rotate: [0, -8, 8, 0] }}
+            animate={{ y: [0, -5, 0], rotate: [0, -7, 7, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-          >♟</motion.span>
+          >
+            <Piece piece="P" />
+          </motion.span>
           <div>
             <h1 className="site-title">FOAI Chess Engine</h1>
             <p className="site-sub">Foundations of Artificial Intelligence</p>
           </div>
         </div>
+
         <nav className="view-tabs" role="tablist" aria-label="Screen">
           <button type="button" role="tab" className="view-tab" aria-selected={view === 'play'}
             onClick={() => setView('play')}>Play</button>
@@ -258,10 +328,10 @@ export default function App() {
             onClick={() => setView('teach')}>Teaching mode</button>
         </nav>
 
-        <div className="header-pills">
-          <span className="pill">Minimax</span>
-          <span className="pill">Alpha-Beta</span>
-          <span className="pill">Iterative Deepening</span>
+        <div className="header-tags">
+          <span className="tag">Minimax</span>
+          <span className="tag">Alpha-Beta</span>
+          <span className="tag">Iterative Deepening</span>
         </div>
       </header>
 
@@ -269,70 +339,53 @@ export default function App() {
         <TeachingMode
           boardState={boardRef.current.serialize()}
           lastMove={lastMove}
-          flip={playerColor === 'b'}
+          flip={flip}
         />
       ) : (
       <main className="layout">
         {/* Left — board */}
         <section className="board-section">
-          <div className="player-tag top">
-            <span className={`player-dot ${playerColor === 'w' ? 'black' : 'white'}`} />
-            <span>Engine ({playerColor === 'w' ? 'Black' : 'White'})</span>
-            {engineThinking && <span className="thinking-badge">thinking…</span>}
+          <Seat
+            name={`Engine (${engineColor === 'w' ? 'White' : 'Black'})`}
+            color={engineColor}
+            squares={squares}
+            badge={engineThinking ? <span className="badge searching">thinking…</span> : null}
+          />
+
+          <div className="board-stage">
+            <EvalBar score={evalScore} flip={flip} />
+            <ChessBoard
+              squares={squares}
+              selectedSq={selectedSq}
+              legalTargets={legalTargets}
+              lastMove={lastMove}
+              checkSq={kingSq}
+              onSquareClick={onSquareClick}
+              flip={flip}
+            />
           </div>
 
-          <div className="board-wrap">
-            <div className="eval-bar-vertical">
-              {(() => {
-                const clamped = Math.max(-800, Math.min(800, evalScore));
-                const whitePct = Math.round(50 + (clamped / 800) * 50);
-                const isWhiteAdv = evalScore >= 0;
-                const scoreText = (evalScore / 100).toFixed(1);
-                
-                return (
-                  <>
-                    <div className="eval-fill-black" style={{ height: `${100 - whitePct}%` }}>
-                      {!isWhiteAdv && <span className="eval-text-black">{Math.abs(scoreText)}</span>}
-                    </div>
-                    <div className="eval-fill-white" style={{ height: `${whitePct}%` }}>
-                      {isWhiteAdv && <span className="eval-text-white">{Math.abs(scoreText)}</span>}
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-            
-            <div className="board-container">
-              <ChessBoard
-                squares={squares}
-                selectedSq={selectedSq}
-                legalTargets={legalTargets}
-                lastMove={lastMove}
-                checkSq={kingSq}
-                onSquareClick={onSquareClick}
-                flip={playerColor === 'b'}
-              />
-            </div>
-          </div>
-
-          <div className="player-tag bottom">
-            <span className={`player-dot ${playerColor === 'w' ? 'white' : 'black'}`} />
-            <span>You ({playerColor === 'w' ? 'White' : 'Black'})</span>
-            <span className={`status-badge ${gameEnd ? 'ended' : sideToMove === playerColor ? 'active' : ''}`}>
-              {statusText}
-            </span>
-          </div>
+          <Seat
+            name={`You (${playerColor === 'w' ? 'White' : 'Black'})`}
+            color={playerColor}
+            squares={squares}
+            badge={
+              <span className={`badge status${gameEnd ? ' ended' : sideToMove === playerColor ? ' active' : ''}`}>
+                {statusText}
+              </span>
+            }
+          />
 
           <div className="controls">
-            <button className="btn btn-ghost" onClick={newGame}>New Game</button>
+            <button className="btn btn-ghost" onClick={newGame}>New game</button>
             <button className="btn btn-ghost" onClick={undoMove} disabled={engineThinking || !moveHistory.length}>Undo</button>
             <button
               className="btn btn-primary"
               onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')}
               disabled={engineThinking || (moveHistory.length > 0 && !gameEnd)}
-              title={(moveHistory.length > 0 && !gameEnd) ? 'Flip Board is only available before a game starts or after it ends' : undefined}
+              title={(moveHistory.length > 0 && !gameEnd) ? 'Flip board is only available before a game starts or after it ends' : undefined}
             >
-              Flip Board
+              Flip board
             </button>
           </div>
         </section>
@@ -352,91 +405,20 @@ export default function App() {
 
       <AnimatePresence>
         {gameEnd && view === 'play' && (
-          <motion.div
-            className="overlay"
-            onClick={newGame}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <motion.div
-              className="overlay-card"
-              onClick={e => e.stopPropagation()}
-              initial={{ scale: 0.75, opacity: 0, y: 30 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-            >
-              <motion.span
-                className="overlay-icon"
-                animate={{ rotate: [0, -15, 15, -10, 10, 0], scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-              >
-                {gameEnd.type === 'checkmate' ? '♛' : '½'}
-              </motion.span>
-              <p className="overlay-eyebrow">Game Over</p>
-              <h2 className="overlay-title">
-                {gameEnd.type === 'checkmate' ? `${gameEnd.winner} wins` : 'Draw'}
-              </h2>
-              <p className="overlay-reason">
-                {gameEnd.type === 'checkmate' ? 'by Checkmate' : `by ${gameEnd.reason}`}
-              </p>
-              <button className="btn btn-primary" onClick={newGame}>Play Again</button>
-            </motion.div>
-          </motion.div>
+          <GameOverModal gameEnd={gameEnd} onPlayAgain={newGame} />
         )}
       </AnimatePresence>
 
-      {/* Promotion Modal */}
       <AnimatePresence>
         {pendingPromotion && (
-          <motion.div
-            className="overlay promotion-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <motion.div
-              className="promotion-card"
-              initial={{ scale: 0.7, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 30 }}
-            >
-              <h3 className="promotion-title">Promote Pawn</h3>
-              <div className="promotion-options">
-                {['q', 'r', 'n', 'b'].map((p, idx) => {
-                  const piece = pendingPromotion.color === 'w' ? p.toUpperCase() : p;
-                  const PIECE_UNICODE = { Q:'♛', R:'♜', B:'♝', N:'♞', q:'♛', r:'♜', b:'♝', n:'♞' };
-                  const isWhitePiece = pendingPromotion.color === 'w';
-                  const pieceStyle = isWhitePiece
-                    ? { color: '#FAFAF8', WebkitTextFillColor: '#FAFAF8', textShadow: '0 0 3px #000, 0 1px 4px rgba(0,0,0,0.85)' }
-                    : { color: '#1A1A18', WebkitTextFillColor: '#1A1A18', textShadow: '0 0 2px rgba(255,255,255,0.25)' };
-                  return (
-                    <motion.button
-                      key={p}
-                      className="promotion-btn"
-                      onClick={() => commitPromotion(p)}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.06, type: 'spring', stiffness: 500, damping: 30 }}
-                      whileHover={{ scale: 1.15, y: -4 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="piece" style={pieceStyle}>
-                        {PIECE_UNICODE[piece]}
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
-              <button className="btn btn-ghost" onClick={() => { setPendingPromotion(null); setSelectedSq(null); setLegalTargets([]); }}>Cancel</button>
-            </motion.div>
-          </motion.div>
+          <PromotionModal
+            color={pendingPromotion.color}
+            onPick={commitPromotion}
+            onCancel={() => { setPendingPromotion(null); setSelectedSq(null); setLegalTargets([]); }}
+          />
         )}
       </AnimatePresence>
+
     </div>
   );
 }

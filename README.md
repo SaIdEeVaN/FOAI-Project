@@ -14,11 +14,12 @@ The AI opponent runs entirely in the browser using a custom chess engine with:
 
 | Feature | Details |
 |---|---|
-| Play vs AI | You play White; the engine plays Black |
+| Play vs AI | Play either colour; *Flip board* swaps sides before a game starts |
 | Legal move hints | Click a piece to see valid squares |
 | Last-move highlight | The previous move is highlighted on the board |
 | Check indicator | The king square turns red when in check |
-| Evaluation bar | Live centipawn score from the engine |
+| Evaluation bar | Live centipawn score from the engine, flipping with the board |
+| Captured material | Each seat shows what it has taken and by how many points it leads |
 | Engine telemetry | Depth, nodes searched, best move log |
 | Move history | Full game record in algebraic notation |
 | Undo | Take back the last pair of moves |
@@ -52,6 +53,20 @@ what a busy middlegame position does to plain minimax.
 
 Quiescence and null-move pruning both depend on the alpha-beta window, so they switch off with it —
 without pruning, a capture search has nothing to cut and grows without bound.
+
+---
+
+## Interface
+
+Both screens are built from one set of design tokens and primitives in `src/index.css` — the same
+cards, uppercase micro-labels, monospace numerals and accent bars appear on the play board and in
+teaching mode.
+
+Every piece on either board is drawn from the SVG symbol set in `src/components/PieceSymbols.jsx`,
+never from a font glyph. The Unicode chess characters (`♙`–`♟`) carry emoji presentation in several
+system fonts, and a colour font ignores `color` and `-webkit-text-fill-color`, so white pieces —
+pawns in particular — were painted black by the OS on the machines that shipped such a font. An SVG
+`fill` has no such opinion, so the pieces look identical everywhere.
 
 ---
 
@@ -93,6 +108,7 @@ chess_react/
 │   │   ├── MoveHistory.jsx     # Move list panel
 │   │   ├── EngineConsole.jsx   # Eval bar + engine telemetry
 │   │   ├── TeachingMode.jsx    # Search comparison screen
+│   │   ├── Modals.jsx          # Game-over and promotion dialogs
 │   │   └── PieceSymbols.jsx    # SVG piece symbol set (#pc-p … #pc-k)
 │   ├── engine/
 │   │   ├── board.js            # Board state + move making
@@ -104,7 +120,7 @@ chess_react/
 │   │   ├── transposition.js    # Zobrist hashing + transposition table
 │   │   └── worker.js           # Web Worker entry point (search + teaching runs)
 │   ├── App.jsx                 # Root component + game logic
-│   ├── index.css               # Global styles + design tokens
+│   ├── index.css               # Design tokens, shared primitives, both screens
 │   └── main.jsx                # React entry point
 ├── public/
 ├── index.html

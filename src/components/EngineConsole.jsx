@@ -1,49 +1,54 @@
+import { useEffect, useRef } from 'react';
+
+const fmtNodes = (n) => n.toLocaleString('en-US');
+
 export default function EngineConsole({ telemetry, logLines, evalScore, thinking }) {
+  const logRef = useRef(null);
+
+  // The newest iteration is the interesting one, so keep it in view.
+  useEffect(() => {
+    const el = logRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [logLines.length]);
+
   // evalScore: positive = White advantage (centipawns)
-  const clamped   = Math.max(-800, Math.min(800, evalScore));
-  const whitePct  = Math.round(50 + (clamped / 800) * 50);
-  const blackPct  = 100 - whitePct;
-  const scoreStr  = evalScore === 0 ? '0.00' : (evalScore > 0 ? '+' : '') + (evalScore / 100).toFixed(2);
+  const scoreStr = evalScore === 0 ? '0.00' : `${evalScore > 0 ? '+' : '−'}${(Math.abs(evalScore) / 100).toFixed(2)}`;
+  const scoreTone = evalScore === 0 ? '' : evalScore > 0 ? ' accent' : ' warn';
+
+  const stats = [
+    { key: 'Best move', value: telemetry?.move || '—', tone: ' accent' },
+    { key: 'Depth', value: telemetry?.depth ?? '—' },
+    { key: 'Nodes', value: fmtNodes(telemetry?.nodes ?? 0) },
+    { key: 'Score', value: scoreStr, tone: scoreTone },
+  ];
 
   return (
-    <div className="panel engine-panel">
-      <div className="panel-header">
-        <p className="panel-label">Engine Console</p>
-        {thinking && <span className="thinking-pill">searching…</span>}
+    <section className="panel engine-panel" aria-labelledby="ec-label">
+      <div className="panel-head">
+        <h2 id="ec-label" className="panel-label">Engine console</h2>
+        {thinking
+          ? <span className="badge searching">searching…</span>
+          : <span className="panel-meta">idle</span>}
       </div>
 
-      {/* Telemetry grid */}
-      {telemetry && (
-        <div className="tele-grid">
-          <div className="tele-item">
-            <span className="tele-key">Best Move</span>
-            <span className="tele-val accent">{telemetry.move || '—'}</span>
+      <div className="stat-grid">
+        {stats.map(({ key, value, tone = '' }) => (
+          <div key={key} className="stat">
+            <span className="stat-key">{key}</span>
+            <span className={`stat-val${tone}`}>{value}</span>
           </div>
-          <div className="tele-item">
-            <span className="tele-key">Depth</span>
-            <span className="tele-val">{telemetry.depth ?? '—'}</span>
-          </div>
-          <div className="tele-item">
-            <span className="tele-key">Nodes</span>
-            <span className="tele-val">{(telemetry.nodes ?? 0).toLocaleString()}</span>
-          </div>
-          <div className="tele-item">
-            <span className="tele-key">Score</span>
-            <span className="tele-val">{scoreStr}</span>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* Log */}
-      <div className="engine-log">
+      <div className="log" ref={logRef} aria-live="polite">
         {logLines.length === 0 ? (
-          <p className="muted log-line">Awaiting first engine move…</p>
+          <p className="log-line empty">Awaiting first engine move…</p>
         ) : (
           logLines.map((line, i) => (
-            <p key={i} className="log-line">{line}</p>
+            <p key={i} className={`log-line${i === logLines.length - 1 ? ' log-latest' : ''}`}>{line}</p>
           ))
         )}
       </div>
-    </div>
+    </section>
   );
 }

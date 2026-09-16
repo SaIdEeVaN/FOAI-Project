@@ -1,5 +1,10 @@
 // Flat single-path Staunton silhouettes, 45×45 viewBox. Render <PieceSymbols /> once,
 // then draw any piece at any size with <Piece piece="N" />.
+//
+// Every piece in the app goes through here on purpose. The Unicode chess glyphs this
+// replaced (♟ and friends) carry emoji presentation in several system fonts, and a
+// colour font ignores `color` / `-webkit-text-fill-color` — so a "white" pawn was
+// painted by the OS as a black one. An SVG fill has no such opinion.
 
 const PATHS = {
   p: 'M22.5 7.5A5.5 5.5 0 0 1 25.8 17.4L28 19L28 21.5L25.6 21.5C25.6 26 28.5 30 31 33L33.5 35.5L33.5 39.5L11.5 39.5L11.5 35.5L14 33C16.5 30 19.4 26 19.4 21.5L17 21.5L17 19L19.2 17.4A5.5 5.5 0 0 1 22.5 7.5Z',
@@ -12,6 +17,11 @@ const PATHS = {
 
 // The knight's eye and the bishop's slit are cut-outs; the queen's balls overlap her crown.
 const FILL_RULE = { p: 'nonzero', r: 'nonzero', n: 'evenodd', b: 'evenodd', q: 'nonzero', k: 'nonzero' };
+
+const NAMES = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
+
+export const pieceName = (piece) =>
+  `${piece === piece.toUpperCase() ? 'White' : 'Black'} ${NAMES[piece.toLowerCase()]}`;
 
 export function PieceSymbols() {
   return (
@@ -27,10 +37,16 @@ export function PieceSymbols() {
   );
 }
 
-export function Piece({ piece, className = '' }) {
+export function Piece({ piece, className = '', label }) {
   const isWhite = piece === piece.toUpperCase();
   return (
-    <svg className={`pc ${isWhite ? 'pc-white' : 'pc-black'} ${className}`} viewBox="0 0 45 45" aria-hidden="true">
+    <svg
+      className={`pc ${isWhite ? 'pc-white' : 'pc-black'} ${className}`}
+      viewBox="0 0 45 45"
+      role={label ? 'img' : undefined}
+      aria-label={label || undefined}
+      aria-hidden={label ? undefined : 'true'}
+    >
       <use href={`#pc-${piece.toLowerCase()}`} />
     </svg>
   );
