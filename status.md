@@ -20,6 +20,6 @@
 - [x] Production build passes (`npm run build`, 430 modules, no errors)
 - [x] Check the screen renders — Node/React server-render smoke test passed (structure, pills, board, breakdown)
 - [x] Update README
-- [ ] Commit and push to `main`
+- [x] Commit and push to `main` (`3b30d37`, which also triggers the Firebase deploy workflow)
 - [ ] **Needs a human look:** open <http://localhost:5173> → *Teaching mode* and check the hand-drawn SVG piece
       silhouettes and the layout; the Chrome extension was not connected, so this was never seen in a browser
