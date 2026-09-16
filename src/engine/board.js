@@ -118,6 +118,39 @@ export class Board {
     this.sideToMove = this.sideToMove === 'w' ? 'b' : 'w';
   }
 
+  // Identity of a position for repetition claims: placement, side to move,
+  // castling rights and en passant. Deliberately not called from makeMove —
+  // the search makes millions of moves and must not pay for this; the game
+  // layer calls it once per committed move.
+  positionKey() {
+    const rights =
+      (this.castlingRights.K ? 'K' : '') +
+      (this.castlingRights.Q ? 'Q' : '') +
+      (this.castlingRights.k ? 'k' : '') +
+      (this.castlingRights.q ? 'q' : '') || '-';
+    const ep = this._capturableEnPassant();
+    return `${this.squares.join('')} ${this.sideToMove} ${rights} ${ep === null ? '-' : ep}`;
+  }
+
+  // An en passant square only tells two positions apart when the capture is
+  // really on. Otherwise a position reached with a spent en passant square
+  // would not match the same position reached without one, and a legitimate
+  // repetition would go unnoticed.
+  _capturableEnPassant() {
+    const ep = this.enPassant;
+    if (ep === null) return null;
+    const pawn = this.sideToMove === 'w' ? 'P' : 'p';
+    // A pawn that could take stands one rank behind the target, on either side.
+    const behind = ep + (this.sideToMove === 'w' ? 8 : -8);
+    for (const step of [-1, 1]) {
+      const from = behind + step;
+      if (from < 0 || from > 63) continue;
+      if (Math.abs((from % 8) - (ep % 8)) !== 1) continue; // Guards the file wrap
+      if (this.squares[from] === pawn) return ep;
+    }
+    return null;
+  }
+
   unmakeMove(move) {
     this.sideToMove = this.sideToMove === 'w' ? 'b' : 'w';
     if (this.sideToMove === 'b') this.fullMoveNumber--;
@@ -152,4 +185,15 @@ export class Board {
       }
     }
   }
+}
+
+// Three occurrences of the same position is a draw. The current position is the
+// last key in the list, and the occurrences need not be consecutive.
+export function hasThreefoldRepetition(keys) {
+  const current = keys[keys.length - 1];
+  let seen = 0;
+  for (let i = keys.length - 1; i >= 0; i--) {
+    if (keys[i] === current && ++seen === 3) return true;
+  }
+  return false;
 }

@@ -71,3 +71,31 @@ both closed.
 - [ ] **Could not verify from this session:** the live site (the egress proxy returns 403 for
       `*.web.app`), and WebKit itself (Playwright's WebKit download is blocked), so iOS was reasoned
       about and tested by proxy rather than run
+
+
+## Threefold repetition
+
+- [x] `Board.positionKey()` — placement, side to move, castling rights and en passant as an exact
+      string, so distinct positions cannot collide. Kept out of `makeMove`, which the search calls
+      millions of times per move; the game layer calls it once per committed move
+- [x] En passant only forms part of the identity when a pawn of the side to move can really capture,
+      otherwise a position reached with a spent en passant square would not match the same position
+      reached without one and a real repetition would be missed
+- [x] `hasThreefoldRepetition(keys)` in `board.js`; App keeps the game's position list in a ref
+      (the worker's `onmessage` closure is installed once and would capture a stale array), pushes
+      after every committed move, resets on New Game and rebuilds on Undo
+- [x] Draw is reported as "Threefold Repetition" alongside stalemate, the fifty-move rule and
+      insufficient material
+- [x] Verified: 12 checks covering the knight-shuffle draw firing at ply 8 and not at ply 4 or 7,
+      non-consecutive repetitions, a normal opening never triggering, side-to-move and castling
+      rights changing the key, capturable vs spent en passant, no file-wrap false positive, and
+      make/unmake restoring the key exactly
+- [x] No regression: perft(0..4) exact, depth-4 plain minimax still 206,604 nodes = cumulative perft
+- [ ] **Not done:** the search itself is still repetition-blind — it cannot aim for a repetition when
+      losing or dodge one when winning
+
+## PRD
+
+- [x] `PRD.md` at the repo root — problem, users, per-screen requirements with status, engine spec,
+      measured results, architecture, known gaps, milestones, acceptance criteria
+- [x] Kept out of the README entirely, on request

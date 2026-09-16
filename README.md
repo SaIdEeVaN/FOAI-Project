@@ -2,8 +2,6 @@
 
 A browser-based chess game built with **React + Vite** as part of the *Foundations of Artificial Intelligence* course project.
 
-Requirements, scope, measured results and known gaps are documented in **[PRD.md](PRD.md)**.
-
 The AI opponent runs entirely in the browser using a custom chess engine with:
 - **Minimax** search with **Alpha-Beta pruning**
 - **MVV-LVA move ordering** and a **Zobrist-hashed transposition table**
@@ -127,7 +125,6 @@ chess_react/
 ├── public/
 ├── index.html
 ├── vite.config.js
-├── PRD.md                      # Product requirements, scope and known gaps
 ├── firebase.json               # Firebase Hosting config
 └── .firebaserc                 # Firebase project alias
 ```

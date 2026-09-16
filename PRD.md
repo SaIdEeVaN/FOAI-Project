@@ -6,7 +6,7 @@
 | **Course** | Foundations of Artificial Intelligence |
 | **Repository** | [SaIdEeVaN/FOAI-Project](https://github.com/SaIdEeVaN/FOAI-Project) |
 | **Live** | Firebase Hosting, project `foai-chess-engine` |
-| **Status** | Milestones 1–5 delivered; §11 lists what is not built |
+| **Status** | Milestones 1–6 delivered; §11 lists what is not built |
 | **Last updated** | 2026-09-16 |
 
 > **About this document.** The product was built before this PRD was written down, so it
@@ -71,7 +71,7 @@ external GUIs.
 | P5 | A king in check is marked distinctly | Done |
 | P6 | Promotion prompts for queen, rook, knight or bishop rather than assuming a queen | Done |
 | P7 | Game end is detected and named: checkmate, stalemate, fifty-move rule, insufficient material | Done |
-| P8 | Threefold repetition is detected | **Not implemented** (§11) |
+| P8 | Threefold repetition is detected and ends the game as a draw | Done |
 | P9 | Undo takes back one full move — the engine's reply and the player's move | Done |
 | P10 | Evaluation bar shows the live score from White's perspective, clamped to ±8 pawns, and flips with the board | Done |
 | P11 | Each seat shows the material it has captured and its point lead | Done |
@@ -129,7 +129,19 @@ share one code path, so the number on the bar and the number in the breakdown ca
 | King safety | −30 on an open file, a further −20 if open for the opponent too; +10 per pawn in the shield when the king is castled wide of the centre |
 | Mobility | Knight and bishop mobility, weighted ×2; knight counts come from a precomputed per-square table |
 
-### 7.4 Correctness
+### 7.4 Repetition identity
+
+Two positions are the same for repetition purposes when placement, side to move, castling
+rights and en passant all match. An en passant square only counts when a pawn of the side to
+move can actually make the capture — otherwise a position reached with a spent en passant
+square would not match the same position reached without one, and a real repetition would go
+unnoticed.
+
+The key is a plain string rather than a Zobrist hash, so distinct positions cannot collide,
+and it is computed once per committed move. It is deliberately absent from `makeMove`, which
+the search calls millions of times per move.
+
+### 7.5 Correctness
 
 Move generation is validated by perft: the node count of an unpruned depth-5 minimax equals
 `perft(0) + … + perft(5)`. Alpha-beta, and every combination of the optional techniques, must
@@ -218,7 +230,7 @@ can fail to load.
 
 | Gap | Consequence | Notes |
 |---|---|---|
-| **Threefold repetition is not detected** | A repeating position plays on until the fifty-move rule ends it | The board's history stack holds unmake data, not position hashes; detecting it means recording a Zobrist key per ply, which `transposition.js` can already compute |
+| **The search itself is not repetition-aware** | The engine cannot steer towards a repetition when losing, or away from one when winning; it only discovers the draw once the game layer declares it | Detection is at the game layer (§7.4). Search awareness means passing the game's position history into the search and scoring a repeated node as a draw |
 | Transposition table is unbounded | Memory grows across a long analysis session | A `Map` with no replacement policy; fine for 2-second searches, not for sustained use |
 | Moves are shown in UCI, not SAN | `b1c3` rather than `Nc3` | Affects the move list and engine log only |
 | No opening book | The engine searches from move one | Deliberate — out of scope per §4 |
@@ -236,7 +248,8 @@ can fail to load.
 | 3 | Iterative deepening, quiescence, MVV-LVA ordering, transposition table; Web Worker | Delivered |
 | 4 | Teaching mode: fixed-depth comparison, technique toggles, evaluation breakdown | Delivered |
 | 5 | Interface pass: one design system across both screens, SVG pieces, mobile and accessibility | Delivered |
-| 6 | Threefold repetition and SAN notation | Not started |
+| 6 | Threefold repetition detection | Delivered |
+| 7 | SAN notation, repetition-aware search | Not started |
 
 ---
 
@@ -244,7 +257,8 @@ can fail to load.
 
 The product is acceptable for submission when all of the following hold:
 
-1. A complete legal game can be played to a named ending against the engine, as either colour.
+1. A complete legal game can be played to a named ending against the engine, as either colour —
+   checkmate, stalemate, threefold repetition, fifty-move rule or insufficient material.
 2. Plain minimax and alpha-beta return the same move and score at the same depth, and the
    plain node count matches cumulative perft.
 3. Teaching mode reports node counts for all three configurations on any reachable position,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Board } from './engine/board.js';
+import { Board, hasThreefoldRepetition } from './engine/board.js';
 import { MoveGenerator } from './engine/moveGen.js';
 import { uciToSq } from './engine/move.js';
 import ChessBoard from './components/ChessBoard.jsx';
@@ -18,10 +18,11 @@ const START_COUNTS = { p: 8, n: 2, b: 2, r: 2, q: 1 };
 const PIECE_VALUE  = { p: 1, n: 3, b: 3, r: 5, q: 9 };
 const CAPTURE_ORDER = ['q', 'r', 'b', 'n', 'p'];
 
-function detectGameEnd(board) {
+function detectGameEnd(board, positionKeys) {
   const gen = new MoveGenerator(board);
   const legal = gen.generateLegalMoves();
   if (legal.length) {
+    if (hasThreefoldRepetition(positionKeys)) return { type: 'draw', reason: 'Threefold Repetition' };
     if (board.halfMoveClock >= 100) return { type: 'draw', reason: '50-Move Rule' };
     const pieces = board.squares.filter(p => p !== '.');
     const types = [...new Set(pieces.map(p => p.toLowerCase()))];
@@ -106,6 +107,12 @@ export default function App() {
   const [view, setView] = useState('play'); // 'play' | 'teach'
   const workerRef = useRef(null);
   const boardRef  = useRef(board);
+
+  // Every position the game has actually stood in, for threefold repetition.
+  // A ref, not state: applyEngineResult runs inside the worker's onmessage
+  // closure, which is installed once and would capture a stale array.
+  const positionsRef = useRef(null);
+  if (positionsRef.current === null) positionsRef.current = [board.positionKey()];
 
   // The worker's onmessage closure is installed once, so anything it reads lives in a ref.
   const playerColorRef = useRef(playerColor);
@@ -200,13 +207,14 @@ export default function App() {
 
   const _executeMove = (move) => {
     boardRef.current.makeMove(move);
+    positionsRef.current.push(boardRef.current.positionKey());
     setSelectedSq(null);
     setLegalTargets([]);
     setLastMove({ from: move.startSq, to: move.targetSq });
     setMoveHistory(prev => [...prev, move.toUci()]);
     syncState();
 
-    const end = detectGameEnd(boardRef.current);
+    const end = detectGameEnd(boardRef.current, positionsRef.current);
     if (end) { setGameEnd(end); return; }
   };
 
@@ -237,6 +245,7 @@ export default function App() {
     if (!move) return;
 
     boardRef.current.makeMove(move);
+    positionsRef.current.push(boardRef.current.positionKey());
     setLastMove({ from, to });
     setMoveHistory(prev => [...prev, payload.uci]);
     // The search scores from the mover's point of view; the bar reads from White's.
@@ -244,12 +253,13 @@ export default function App() {
     setTelemetry({ depth: payload.depth, nodes: payload.nodes, score: payload.score, move: payload.uci });
     syncState();
 
-    const end = detectGameEnd(boardRef.current);
+    const end = detectGameEnd(boardRef.current, positionsRef.current);
     if (end) setGameEnd(end);
   };
 
   const newGame = () => {
     boardRef.current.reset();
+    positionsRef.current = [boardRef.current.positionKey()];
     setSquares([...boardRef.current.squares]);
     setSideToMove('w');
     setSelectedSq(null);
@@ -273,11 +283,16 @@ export default function App() {
     // Simplest approach: reset and replay
     const replayMoves = moveHistory.slice(0, -count);
     boardRef.current.reset();
+    const keys = [boardRef.current.positionKey()];
     for (const uci of replayMoves) {
       const legal = new MoveGenerator(boardRef.current).generateLegalMoves();
       const move = legal.find(m => m.toUci() === uci);
-      if (move) boardRef.current.makeMove(move);
+      if (move) {
+        boardRef.current.makeMove(move);
+        keys.push(boardRef.current.positionKey());
+      }
     }
+    positionsRef.current = keys;
     setMoveHistory(replayMoves);
     setLastMove(replayMoves.length ? { from: uciToSq(replayMoves.at(-1).slice(0,2)), to: uciToSq(replayMoves.at(-1).slice(2,4)) } : null);
     setSelectedSq(null);
