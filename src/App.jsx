@@ -6,6 +6,8 @@ import { Move, uciToSq } from './engine/move.js';
 import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
+import TeachingMode from './components/TeachingMode.jsx';
+import { PieceSymbols } from './components/PieceSymbols.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -43,6 +45,7 @@ export default function App() {
   const [evalScore, setEvalScore] = useState(0);
   const [playerColor, setPlayerColor] = useState('w');
   const [pendingPromotion, setPendingPromotion] = useState(null); // { from, to, color }
+  const [view, setView] = useState('play'); // 'play' | 'teach'
   const workerRef = useRef(null);
   const boardRef  = useRef(board);
 
@@ -235,6 +238,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <PieceSymbols />
       <header className="header">
         <div className="header-left">
           <motion.span
@@ -247,6 +251,13 @@ export default function App() {
             <p className="site-sub">Foundations of Artificial Intelligence</p>
           </div>
         </div>
+        <nav className="view-tabs" role="tablist" aria-label="Screen">
+          <button type="button" role="tab" className="view-tab" aria-selected={view === 'play'}
+            onClick={() => setView('play')}>Play</button>
+          <button type="button" role="tab" className="view-tab" aria-selected={view === 'teach'}
+            onClick={() => setView('teach')}>Teaching mode</button>
+        </nav>
+
         <div className="header-pills">
           <span className="pill">Minimax</span>
           <span className="pill">Alpha-Beta</span>
@@ -254,6 +265,13 @@ export default function App() {
         </div>
       </header>
 
+      {view === 'teach' ? (
+        <TeachingMode
+          boardState={boardRef.current.serialize()}
+          lastMove={lastMove}
+          flip={playerColor === 'b'}
+        />
+      ) : (
       <main className="layout">
         {/* Left — board */}
         <section className="board-section">
@@ -330,9 +348,10 @@ export default function App() {
           />
         </section>
       </main>
+      )}
 
       <AnimatePresence>
-        {gameEnd && (
+        {gameEnd && view === 'play' && (
           <motion.div
             className="overlay"
             onClick={newGame}

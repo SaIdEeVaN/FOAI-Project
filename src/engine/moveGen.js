@@ -178,26 +178,29 @@ export class MoveGenerator {
         if (p === (attackingColor === 'b' ? 'k' : 'K')) return true;
       }
     }
-    // Sliding
-    const sliding = {
-      b: [-9, -7, 7, 9], r: [-8, -1, 1, 8], q: [-9, -8, -7, -1, 1, 7, 8, 9]
-    };
-    for (const [pt, dirs] of Object.entries(sliding)) {
-      const ep = attackingColor === 'b' ? pt : pt.toUpperCase();
-      const eq = attackingColor === 'b' ? 'q' : 'Q';
-      for (const dir of dirs) {
-        for (let step = 1; step < 8; step++) {
-          const t = sq + dir * step;
-          if (t < 0 || t >= 64) break;
-          if (Math.abs(((t - dir) % 8) - (t % 8)) > 1) break;
-          const p = this.board.squares[t];
-          if (p !== '.') {
-            if (p === ep || p === eq) return true;
-            break;
-          }
+    // Sliding: bishops/queens on diagonals, rooks/queens on files and ranks
+    const eq = attackingColor === 'b' ? 'q' : 'Q';
+    const eb = attackingColor === 'b' ? 'b' : 'B';
+    const er = attackingColor === 'b' ? 'r' : 'R';
+    return this._rayHits(sq, DIAGONALS, eb, eq) || this._rayHits(sq, ORTHOGONALS, er, eq);
+  }
+
+  _rayHits(sq, dirs, slider, queen) {
+    for (const dir of dirs) {
+      for (let step = 1; step < 8; step++) {
+        const t = sq + dir * step;
+        if (t < 0 || t >= 64) break;
+        if (Math.abs(((t - dir) % 8) - (t % 8)) > 1) break;
+        const p = this.board.squares[t];
+        if (p !== '.') {
+          if (p === slider || p === queen) return true;
+          break;
         }
       }
     }
     return false;
   }
 }
+
+const DIAGONALS   = [-9, -7, 7, 9];
+const ORTHOGONALS = [-8, -1, 1, 8];

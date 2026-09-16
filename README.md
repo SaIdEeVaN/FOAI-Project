@@ -4,6 +4,7 @@ A browser-based chess game built with **React + Vite** as part of the *Foundatio
 
 The AI opponent runs entirely in the browser using a custom chess engine with:
 - **Minimax** search with **Alpha-Beta pruning**
+- **MVV-LVA move ordering** and a **Zobrist-hashed transposition table**
 - **Iterative Deepening** for time-controlled play
 - A Web Worker so the UI stays responsive while the engine thinks
 
@@ -21,6 +22,36 @@ The AI opponent runs entirely in the browser using a custom chess engine with:
 | Engine telemetry | Depth, nodes searched, best move log |
 | Move history | Full game record in algebraic notation |
 | Undo | Take back the last pair of moves |
+| Teaching mode | Searches the current position three ways at a fixed depth and compares node counts |
+
+---
+
+## Teaching Mode
+
+The **Teaching mode** tab snapshots the position on the board and searches it three times at a
+fixed depth of 5 — once with plain minimax, once with alpha-beta, and once with whichever
+techniques are switched on in the pill row. All three usually return the same move; what changes
+is how much work it took, which is the point of the screen.
+
+Measured on the starting position (Node 24, one core):
+
+| Configuration | Nodes | Time | Relative |
+|---|---|---|---|
+| Plain Minimax | 5,072,213 | 13.6s | baseline |
+| + Alpha-Beta | 113,360 | 0.69s | 45× fewer |
+| + MVV-LVA + TT | 58,356 | 0.77s | 87× fewer |
+
+Note that the third configuration searches half as many nodes as the second but takes slightly
+longer: every node it visits pays for a Zobrist hash. Fewer nodes is not automatically less time.
+
+The plain node count is exactly `perft(0) + … + perft(5)`, which is a useful correctness check on
+the move generator. Searches run one at a time in a dedicated Web Worker, and each result appears
+as soon as it lands. Finished searches are cached, so toggling a technique only re-runs what changed.
+A search that passes 60 seconds stops and reports its node count as a lower bound (`≥`), which is
+what a busy middlegame position does to plain minimax.
+
+Quiescence and null-move pruning both depend on the alpha-beta window, so they switch off with it —
+without pruning, a capture search has nothing to cut and grows without bound.
 
 ---
 
@@ -60,12 +91,18 @@ chess_react/
 │   ├── components/
 │   │   ├── ChessBoard.jsx      # Board rendering + square interaction
 │   │   ├── MoveHistory.jsx     # Move list panel
-│   │   └── EngineConsole.jsx   # Eval bar + engine telemetry
+│   │   ├── EngineConsole.jsx   # Eval bar + engine telemetry
+│   │   ├── TeachingMode.jsx    # Search comparison screen
+│   │   └── PieceSymbols.jsx    # SVG piece symbol set (#pc-p … #pc-k)
 │   ├── engine/
 │   │   ├── board.js            # Board state + move making
 │   │   ├── moveGen.js          # Legal move generation
 │   │   ├── move.js             # Move encoding/decoding
-│   │   └── worker.js           # Web Worker entry point (search)
+│   │   ├── evaluation.js       # Static evaluation + per-term breakdown
+│   │   ├── search.js           # Iterative deepening search (game play)
+│   │   ├── teachingSearch.js   # Fixed-depth search with switchable techniques
+│   │   ├── transposition.js    # Zobrist hashing + transposition table
+│   │   └── worker.js           # Web Worker entry point (search + teaching runs)
 │   ├── App.jsx                 # Root component + game logic
 │   ├── index.css               # Global styles + design tokens
 │   └── main.jsx                # React entry point

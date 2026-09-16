@@ -1,5 +1,7 @@
 // ── Board representation ──────────────────────────────────────────────────
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+// A move from or to a rook's home corner removes that castling right.
+const ROOK_CORNERS = { 63: 'K', 56: 'Q', 7: 'k', 0: 'q' };
 
 export class Board {
   constructor() {
@@ -100,10 +102,10 @@ export class Board {
     // Castling rights
     if (pieceMoved === 'K') { this.castlingRights.K = false; this.castlingRights.Q = false; }
     if (pieceMoved === 'k') { this.castlingRights.k = false; this.castlingRights.q = false; }
-    const rookMap = { 63: 'K', 56: 'Q', 7: 'k', 0: 'q' };
-    [move.startSq, move.targetSq].forEach(sq => {
-      if (rookMap[sq]) this.castlingRights[rookMap[sq]] = false;
-    });
+    const fromCorner = ROOK_CORNERS[move.startSq];
+    if (fromCorner) this.castlingRights[fromCorner] = false;
+    const toCorner = ROOK_CORNERS[move.targetSq];
+    if (toCorner) this.castlingRights[toCorner] = false;
 
     // Half-move clock
     if (pieceMoved.toLowerCase() === 'p' || move.pieceCaptured !== '.') {

@@ -124,16 +124,17 @@ export class SearchEngine {
   }
 
   _order(moves, ttMove) {
-    return moves.slice().sort((a, b) => this._score(b, ttMove) - this._score(a, ttMove));
+    return moves.slice().sort((a, b) => scoreMove(b, ttMove) - scoreMove(a, ttMove));
   }
+}
 
-  _score(move, ttMove) {
-    let s = 0;
-    if (ttMove && move.equals(ttMove)) s = 10000;
-    if (move.pieceCaptured !== '.') {
-      s += 100 + (PIECE_ORDER[move.pieceCaptured.toLowerCase()] || 0) * 10 - (PIECE_ORDER[move.pieceMoved.toLowerCase()] || 0);
-    }
-    if (move.promotionPiece !== '.') s += 50;
-    return s;
+// Hash move first, then MVV-LVA captures, then promotions.
+export function scoreMove(move, ttMove) {
+  let s = 0;
+  if (ttMove && move.equals(ttMove)) s = 10000;
+  if (move.pieceCaptured !== '.') {
+    s += 100 + (PIECE_ORDER[move.pieceCaptured.toLowerCase()] || 0) * 10 - (PIECE_ORDER[move.pieceMoved.toLowerCase()] || 0);
   }
+  if (move.promotionPiece !== '.') s += 50;
+  return s;
 }
