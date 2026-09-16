@@ -12,7 +12,7 @@ self.onmessage = (e) => {
     const board = new Board();
     board.loadFrom(payload.boardState);
 
-    const engine = new SearchEngine(board);
+    const engine = new SearchEngine(board, payload.positionHistory || []);
     const { bestMove, depth, nodes, score } = engine.getBestMove(
       payload.timeLimitMs || 2000,
       (info) => self.postMessage({ type: 'progress', payload: info })

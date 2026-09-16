@@ -6,7 +6,7 @@
 | **Course** | Foundations of Artificial Intelligence |
 | **Repository** | [SaIdEeVaN/FOAI-Project](https://github.com/SaIdEeVaN/FOAI-Project) |
 | **Live** | Firebase Hosting, project `foai-chess-engine` |
-| **Status** | Milestones 1–6 delivered; §11 lists what is not built |
+| **Status** | Milestones 1–7 delivered; §11 lists what is not built |
 | **Last updated** | 2026-09-16 |
 
 > **About this document.** The product was built before this PRD was written down, so it
@@ -77,6 +77,7 @@ external GUIs.
 | P11 | Each seat shows the material it has captured and its point lead | Done |
 | P12 | Move history lists the game in UCI, newest move highlighted and scrolled into view | Done |
 | P13 | Engine console reports best move, depth, nodes and score, plus a line per deepening iteration | Done |
+| P14 | The engine heads for a repetition when it is losing and steers clear of one when it is winning | Done |
 
 ## 6. Functional requirements — Teaching mode
 
@@ -137,9 +138,26 @@ move can actually make the capture — otherwise a position reached with a spent
 square would not match the same position reached without one, and a real repetition would go
 unnoticed.
 
-The key is a plain string rather than a Zobrist hash, so distinct positions cannot collide,
-and it is computed once per committed move. It is deliberately absent from `makeMove`, which
-the search calls millions of times per move.
+The key is a plain string rather than a Zobrist hash, so distinct positions cannot collide.
+It is deliberately absent from `makeMove`, which the search calls millions of times per move;
+the game layer calls it once per committed move, and the search maintains its own stack.
+
+**In the search.** The game's position history is passed into the search, which appends to it
+as it makes moves. A node whose position already appears — in the game, or earlier on the
+current line — scores 0. One earlier occurrence is enough: a position reachable twice is
+usually reachable a third time, and waiting for a literal third occurrence would blind the
+engine to forced repetitions. This is what lets it head for a draw when it is losing and
+refuse one when it is winning. The scan is bounded by `halfMoveClock`, since nothing before
+the last irreversible move can match, and steps two plies at a time, since only positions with
+the same side to move can. Quiescence needs no check at all: it searches captures only, and a
+capture resets the clock.
+
+The check runs **before** the transposition probe. A cached score for the position would
+otherwise be returned and hide the fact that the line had repeated it.
+
+Teaching mode's search is deliberately left repetition-blind. Its whole claim is that plain
+minimax visits exactly the cumulative perft (§7.5), and pruning repeated positions would
+corrupt that count.
 
 ### 7.5 Correctness
 
@@ -181,6 +199,11 @@ Two results worth reading carefully, because both are pedagogically the point:
   node it touches pays for a Zobrist hash. Fewer nodes is not automatically less time.
 - The plain node count is exactly the cumulative perft, which is what makes it a correctness
   check on the move generator rather than just a performance number.
+
+**Cost of repetition awareness.** Tracking positions through the search costs 2–5% of search
+speed (97.6k to 95.2k nodes/second on the start position, 103.3k to 98.1k on an Italian
+middlegame). Both positions still reach the same depth in the same budget and return the same
+move. The game layer's own detection costs nothing measurable, being one key per played move.
 
 **Evaluation performance.** Evaluation was roughly 65% of search time. Replacing case
 conversion with lookup tables, per-call arrays with pawn-file counters, and hoisting constants
@@ -230,7 +253,8 @@ can fail to load.
 
 | Gap | Consequence | Notes |
 |---|---|---|
-| **The search itself is not repetition-aware** | The engine cannot steer towards a repetition when losing, or away from one when winning; it only discovers the draw once the game layer declares it | Detection is at the game layer (§7.4). Search awareness means passing the game's position history into the search and scoring a repeated node as a draw |
+| The search scores the *first* repetition as a draw | Inside the tree a position seen twice is treated as drawn, which is one occurrence short of the actual rule | Deliberate, and what engines normally do: waiting for a literal third occurrence would hide forced repetitions. The game layer still requires a true threefold before declaring the draw |
+| Draw scores are a flat 0, with no contempt setting | The engine values a draw identically whoever it is playing, so it will take one from a marginally better position | A contempt term would let it decline drawish lines when it judges itself stronger |
 | Transposition table is unbounded | Memory grows across a long analysis session | A `Map` with no replacement policy; fine for 2-second searches, not for sustained use |
 | Moves are shown in UCI, not SAN | `b1c3` rather than `Nc3` | Affects the move list and engine log only |
 | No opening book | The engine searches from move one | Deliberate — out of scope per §4 |
@@ -249,7 +273,8 @@ can fail to load.
 | 4 | Teaching mode: fixed-depth comparison, technique toggles, evaluation breakdown | Delivered |
 | 5 | Interface pass: one design system across both screens, SVG pieces, mobile and accessibility | Delivered |
 | 6 | Threefold repetition detection | Delivered |
-| 7 | SAN notation, repetition-aware search | Not started |
+| 7 | Repetition-aware search | Delivered |
+| 8 | SAN notation | Not started |
 
 ---
 

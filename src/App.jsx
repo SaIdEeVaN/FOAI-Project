@@ -222,7 +222,11 @@ export default function App() {
     setEngineThinking(true);
     workerRef.current.postMessage({
       type: 'search',
-      payload: { boardState: boardRef.current.serialize(), timeLimitMs: 2000 },
+      payload: {
+        boardState: boardRef.current.serialize(),
+        timeLimitMs: 2000,
+        positionHistory: positionsRef.current,
+      },
     });
   }, []);
 

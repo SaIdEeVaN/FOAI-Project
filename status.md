@@ -99,3 +99,26 @@ both closed.
 - [x] `PRD.md` at the repo root — problem, users, per-screen requirements with status, engine spec,
       measured results, architecture, known gaps, milestones, acceptance criteria
 - [x] Kept out of the README entirely, on request
+
+
+## Threefold repetition, part two — the search
+
+- [x] The game's position history is passed into `SearchEngine`, which appends to it as it makes
+      moves; a node whose position already appears scores 0
+- [x] One earlier occurrence is enough inside the tree. Holding out for a literal third would hide
+      forced repetitions, so this is the standard engine behaviour; the game layer still requires a
+      true threefold before it declares the draw
+- [x] The check runs before the transposition probe — a cached score would otherwise be handed back
+      and hide that the line had repeated the position
+- [x] The scan is bounded by `halfMoveClock` (nothing before the last irreversible move can match)
+      and steps two plies at a time (only the same side to move can match). Quiescence is exempt:
+      captures only, and a capture resets the clock
+- [x] Behaviour verified: a queen down with a repetition available, the engine plays it and scores 0
+      instead of −1060; a queen up in the same shape, it refuses and mates instead; an unrelated
+      history changes nothing
+- [x] Cost measured at 2–5% of search speed (97.6k → 95.2k n/s start, 103.3k → 98.1k n/s Italian),
+      same depth reached and same moves returned
+- [x] `teachingSearch.js` deliberately left alone — repetition pruning would corrupt the perft
+      equivalence that teaching mode exists to demonstrate. Re-checked: plain minimax depth 4 is
+      still 206,604 nodes = cumulative perft, and alpha-beta still agrees with it
+- [ ] **Not done:** draw scores are a flat 0, with no contempt setting
