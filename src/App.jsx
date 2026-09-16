@@ -8,7 +8,7 @@ import MoveHistory from './components/MoveHistory.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
 import TeachingMode from './components/TeachingMode.jsx';
 import { GameOverModal, PromotionModal } from './components/Modals.jsx';
-import { PieceSymbols, Piece, pieceName } from './components/PieceSymbols.jsx';
+import { Piece, pieceName } from './components/PieceSymbols.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -305,7 +305,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <PieceSymbols />
       <header className="header">
         <div className="header-left">
           <motion.span

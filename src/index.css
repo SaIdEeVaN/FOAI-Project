@@ -188,6 +188,8 @@ html, body, #root {
 .logo-mark .pc {
   width: 100%;
   height: 100%;
+}
+.logo-mark .pc path {
   fill: var(--accent);
   stroke: #2B3320;
   stroke-width: 1.4;
@@ -381,10 +383,14 @@ html, body, #root {
 
 /* ── Pieces ───────────────────────────────────────────────────────────── */
 /* Vector, never a font glyph: several system fonts render U+265F and friends
-   as colour emoji, which ignore `color` and paint every pawn black. */
+   as colour emoji, which ignore `color` and paint every pawn black.
+
+   The fill and stroke of a piece are presentation attributes on the path itself
+   (see PieceSymbols.jsx) rather than rules here, so a piece is never left with
+   SVG's initial fill — black — if a stylesheet is missing, stale, or fails to
+   reach it. To recolour a piece, target the path: a rule there outranks the
+   attribute, which is how the header mark goes green below. */
 .pc { display: block; overflow: visible; }
-.pc-white { fill: #F8F7F3; stroke: #22211E; stroke-width: 1.5; }
-.pc-black { fill: #1F1E1B; stroke: rgba(255, 255, 255, 0.3); stroke-width: 1.1; }
 
 .piece {
   display: block;

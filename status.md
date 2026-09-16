@@ -46,3 +46,28 @@
       the emoji-glyph favicon with an SVG pawn
 - [x] Checked in Chromium on the production build: play as White and as Black, flipped board and bar, undo,
       new game, teaching-mode round trip, promotion and game-over dialogs, no horizontal overflow at 390px
+
+
+## Follow-up — still black on a phone
+
+Reported after the first fix shipped: white pawns were still black on mobile. Two independent causes,
+both closed.
+
+- [x] **The colour depended on a stylesheet reaching into a `<use>` shadow tree.** Pieces were
+      `<svg class="pc-white"><use href="#pc-p"></svg>` with `fill` set by a CSS rule on the wrapper.
+      WebKit/iOS does not reliably cascade CSS into the shadow tree a `<use>` creates, and a path with
+      no fill applied falls back to SVG's initial value — **black**. That is exactly the reported
+      symptom: white pieces turn black while black pieces look fine by accident.
+      Paths are now inlined per piece, with `fill` and `stroke` as presentation attributes on the path
+      itself. Verified in Chromium at 390px and under iPhone 13 emulation: 16 white + 16 black, and
+      **identical with the stylesheet blocked outright**, which is the point — the colour no longer
+      depends on CSS at all. CSS can still override deliberately by targeting `.pc path`, which is how
+      the header mark stays accent green
+- [x] **Phones could hold a stale build.** `firebase.json` set no cache headers, so Firebase's default
+      let a phone keep `index.html` — and therefore the fingerprinted JS it names — for an hour after a
+      deploy. HTML is now `no-cache, must-revalidate`; `/assets/**` is `immutable`, since Vite
+      fingerprints it. The catch-all is listed first so the config is correct whichever way Firebase
+      resolves overlapping globs
+- [ ] **Could not verify from this session:** the live site (the egress proxy returns 403 for
+      `*.web.app`), and WebKit itself (Playwright's WebKit download is blocked), so iOS was reasoned
+      about and tested by proxy rather than run

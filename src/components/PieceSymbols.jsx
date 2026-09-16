@@ -1,10 +1,17 @@
-// Flat single-path Staunton silhouettes, 45×45 viewBox. Render <PieceSymbols /> once,
-// then draw any piece at any size with <Piece piece="N" />.
+// Flat single-path Staunton silhouettes, 45×45 viewBox. Draw any piece at any size
+// with <Piece piece="N" />.
 //
-// Every piece in the app goes through here on purpose. The Unicode chess glyphs this
-// replaced (♟ and friends) carry emoji presentation in several system fonts, and a
-// colour font ignores `color` / `-webkit-text-fill-color` — so a "white" pawn was
-// painted by the OS as a black one. An SVG fill has no such opinion.
+// Two rules keep a piece the colour it claims to be, on every device:
+//
+//   1. The path is inlined, not referenced through <use href="#…">. CSS does not
+//      reliably cascade into a <use> shadow tree on WebKit/iOS.
+//   2. fill and stroke are presentation attributes on the path itself, not
+//      stylesheet rules. A path with no fill applied falls back to SVG's initial
+//      value — black — so a white piece that loses its stylesheet, or whose CSS
+//      never reaches it, renders as a black piece. That was the bug on mobile.
+//
+// CSS can still override a piece deliberately by targeting `.pc path`; a rule on
+// the path beats the path's own presentation attribute.
 
 const PATHS = {
   p: 'M22.5 7.5A5.5 5.5 0 0 1 25.8 17.4L28 19L28 21.5L25.6 21.5C25.6 26 28.5 30 31 33L33.5 35.5L33.5 39.5L11.5 39.5L11.5 35.5L14 33C16.5 30 19.4 26 19.4 21.5L17 21.5L17 19L19.2 17.4A5.5 5.5 0 0 1 22.5 7.5Z',
@@ -18,36 +25,37 @@ const PATHS = {
 // The knight's eye and the bishop's slit are cut-outs; the queen's balls overlap her crown.
 const FILL_RULE = { p: 'nonzero', r: 'nonzero', n: 'evenodd', b: 'evenodd', q: 'nonzero', k: 'nonzero' };
 
+const TONE = {
+  white: { fill: '#F8F7F3', stroke: '#22211E', width: 1.5 },
+  black: { fill: '#1F1E1B', stroke: 'rgba(255, 255, 255, 0.3)', width: 1.1 },
+};
+
 const NAMES = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
 
 export const pieceName = (piece) =>
   `${piece === piece.toUpperCase() ? 'White' : 'Black'} ${NAMES[piece.toLowerCase()]}`;
 
-export function PieceSymbols() {
-  return (
-    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
-      <defs>
-        {Object.entries(PATHS).map(([type, d]) => (
-          <symbol key={type} id={`pc-${type}`} viewBox="0 0 45 45">
-            <path d={d} fillRule={FILL_RULE[type]} strokeLinejoin="round" />
-          </symbol>
-        ))}
-      </defs>
-    </svg>
-  );
-}
-
 export function Piece({ piece, className = '', label }) {
-  const isWhite = piece === piece.toUpperCase();
+  const type = piece.toLowerCase();
+  const tone = piece === piece.toUpperCase() ? 'white' : 'black';
+  const { fill, stroke, width } = TONE[tone];
+
   return (
     <svg
-      className={`pc ${isWhite ? 'pc-white' : 'pc-black'} ${className}`}
+      className={`pc pc-${tone} ${className}`}
       viewBox="0 0 45 45"
       role={label ? 'img' : undefined}
       aria-label={label || undefined}
       aria-hidden={label ? undefined : 'true'}
     >
-      <use href={`#pc-${piece.toLowerCase()}`} />
+      <path
+        d={PATHS[type]}
+        fillRule={FILL_RULE[type]}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={width}
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
