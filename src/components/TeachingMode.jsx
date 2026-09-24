@@ -85,6 +85,17 @@ function describeCustom(config) {
   return { name, description };
 }
 
+// Pruning and ordering only change the cost. Quiescence and null-move pruning can
+// change the answer too, so the page stops promising the same move when either is on.
+function describeAgreement({ quiescence, nullMove }) {
+  if (!quiescence && !nullMove) return 'Same depth, same answer — only the cost changes.';
+  const reasons = [
+    quiescence && `quiescence keeps following captures past depth ${DEPTH}, so it sees further`,
+    nullMove && 'null-move pruning skips lines it judges hopeless without fully checking them',
+  ].filter(Boolean);
+  return `The first two always agree on the move. The third card may not: ${reasons.join("; ")}.`;
+}
+
 // ── Search runner ─────────────────────────────────────────────────────────
 // One dedicated worker, one config at a time. A search keeps running across pill
 // toggles as long as some card still wants it; only unwanted searches are killed.
@@ -330,7 +341,7 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
         </header>
         <p className="tm-sub">
           Run the same position through three configurations and compare the work each one does.
-          Same depth, same answer — only the cost changes.
+          {' '}{describeAgreement(custom)}
         </p>
 
         <div className="tm-compare">
