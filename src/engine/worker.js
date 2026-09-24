@@ -12,15 +12,18 @@ self.onmessage = (e) => {
     const board = new Board();
     board.loadFrom(payload.boardState);
 
+    // The id is echoed back so the page can drop a search it has since abandoned.
+    const { id } = payload;
     const engine = new SearchEngine(board, payload.positionHistory || []);
     const { bestMove, depth, nodes, score } = engine.getBestMove(
       payload.timeLimitMs || 2000,
-      (info) => self.postMessage({ type: 'progress', payload: info })
+      (info) => self.postMessage({ type: 'progress', payload: { id, ...info } })
     );
 
     self.postMessage({
       type: 'result',
       payload: {
+        id,
         uci: bestMove ? bestMove.toUci() : null,
         depth,
         nodes,

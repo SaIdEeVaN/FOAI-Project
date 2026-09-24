@@ -31,16 +31,18 @@ export function GameOverModal({ gameEnd, onPlayAgain }) {
           animate={{ rotate: [0, -12, 12, -8, 8, 0], scale: [1, 1.15, 1] }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          {gameEnd.type === 'checkmate'
+          {gameEnd.winner
             ? <Piece piece={gameEnd.winner === 'White' ? 'K' : 'k'} />
             : <span className="modal-draw">½</span>}
         </motion.span>
         <p className="modal-eyebrow">Game over</p>
         <h2 className="modal-title">
-          {gameEnd.type === 'checkmate' ? `${gameEnd.winner} wins` : 'Draw'}
+          {gameEnd.winner ? `${gameEnd.winner} wins` : 'Draw'}
         </h2>
         <p className="modal-sub">
-          {gameEnd.type === 'checkmate' ? 'by checkmate' : `by ${gameEnd.reason.toLowerCase()}`}
+          {gameEnd.type === 'checkmate' ? 'by checkmate'
+            : gameEnd.type === 'resign' ? 'by resignation'
+            : `by ${gameEnd.reason.toLowerCase()}`}
         </p>
         <button className="btn btn-primary" onClick={onPlayAgain}>Play again</button>
       </motion.div>
