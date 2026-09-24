@@ -470,6 +470,13 @@ html, body, #root {
   font-weight: 600;
 }
 .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+.btn-danger {
+  background: #B3412F;
+  border-color: #B3412F;
+  color: #FFF;
+  font-weight: 600;
+}
+.btn-danger:hover:not(:disabled) { background: #9A3626; }
 
 /* ── Move history ─────────────────────────────────────────────────────── */
 .move-table {

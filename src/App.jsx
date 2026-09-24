@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Board, hasThreefoldRepetition } from './engine/board.js';
 import { MoveGenerator } from './engine/moveGen.js';
+import { Evaluation } from './engine/evaluation.js';
 import { uciToSq } from './engine/move.js';
 import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
@@ -12,6 +13,11 @@ import { Piece, pieceName } from './components/PieceSymbols.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
+const evaluator = new Evaluation();
+
+// Instant, search-free read of a position, from White's side. It moves the bar the
+// moment a piece lands; the engine's deeper scores then refine it as they arrive.
+const staticEval = (board) => evaluator.evaluate(board);
 
 // What each side starts with, for the captured-material strip.
 const START_COUNTS = { p: 8, n: 2, b: 2, r: 2, q: 1 };
@@ -105,7 +111,11 @@ export default function App() {
   const [playerColor, setPlayerColor] = useState('w');
   const [pendingPromotion, setPendingPromotion] = useState(null); // { from, to, color }
   const [view, setView] = useState('play'); // 'play' | 'teach'
+  const [confirmResign, setConfirmResign] = useState(false);
   const workerRef = useRef(null);
+  // Id of the search whose messages still count. Resigning or starting a new game
+  // bumps it, so a search already running in the worker is ignored when it lands.
+  const searchIdRef = useRef(0);
   const boardRef  = useRef(board);
 
   // Every position the game has actually stood in, for threefold repetition.
@@ -128,10 +138,14 @@ export default function App() {
 
   const handleWorkerMsg = useCallback((e) => {
     const { type, payload } = e.data;
+    if ((type === 'progress' || type === 'result') && payload.id !== searchIdRef.current) return;
     if (type === 'progress') {
       const line = `d${payload.depth}  score ${(payload.score/100).toFixed(2)}  nodes ${payload.nodes.toLocaleString()}  ${payload.move || ''}`;
       setLogLines(prev => [...prev.slice(-20), line]);
       setTelemetry(payload);
+      // Live bar: each finished iteration is the engine's current opinion.
+      // The search scores from the mover's (engine's) side; the bar reads from White's.
+      setEvalScore(playerColorRef.current === 'w' ? -payload.score : payload.score);
     }
     if (type === 'result') {
       applyEngineResult(payload);
@@ -212,6 +226,8 @@ export default function App() {
     setLegalTargets([]);
     setLastMove({ from: move.startSq, to: move.targetSq });
     setMoveHistory(prev => [...prev, move.toUci()]);
+    setEvalScore(staticEval(boardRef.current));
+    setConfirmResign(false);
     syncState();
 
     const end = detectGameEnd(boardRef.current, positionsRef.current);
@@ -220,9 +236,11 @@ export default function App() {
 
   const requestEngine = useCallback(() => {
     setEngineThinking(true);
+    const id = ++searchIdRef.current;
     workerRef.current.postMessage({
       type: 'search',
       payload: {
+        id,
         boardState: boardRef.current.serialize(),
         timeLimitMs: 2000,
         positionHistory: positionsRef.current,
@@ -262,6 +280,8 @@ export default function App() {
   };
 
   const newGame = () => {
+    searchIdRef.current++;
+    setConfirmResign(false);
     boardRef.current.reset();
     positionsRef.current = [boardRef.current.positionKey()];
     setSquares([...boardRef.current.squares]);
@@ -276,6 +296,25 @@ export default function App() {
     setEvalScore(0);
     setEngineThinking(false);
   };
+
+  const resign = () => {
+    if (gameEnd) return;
+    if (!confirmResign) { setConfirmResign(true); return; }
+    searchIdRef.current++; // Drop any search still running
+    setConfirmResign(false);
+    setEngineThinking(false);
+    setSelectedSq(null);
+    setLegalTargets([]);
+    setPendingPromotion(null);
+    setGameEnd({ type: 'resign', winner: playerColor === 'w' ? 'Black' : 'White' });
+  };
+
+  // An unanswered "Confirm resign?" quietly backs out after a few seconds.
+  useEffect(() => {
+    if (!confirmResign) return;
+    const t = setTimeout(() => setConfirmResign(false), 4000);
+    return () => clearTimeout(t);
+  }, [confirmResign]);
 
   const undoMove = () => {
     if (engineThinking || !moveHistory.length) return;
@@ -302,14 +341,15 @@ export default function App() {
     setSelectedSq(null);
     setLegalTargets([]);
     setGameEnd(null);
+    setEvalScore(staticEval(boardRef.current));
     syncState();
   };
 
   // ── Status text ───────────────────────────────────────────────────────────
   let statusText;
   if (gameEnd) {
-    statusText = gameEnd.type === 'checkmate'
-      ? `Checkmate — ${gameEnd.winner} wins`
+    statusText = gameEnd.type === 'checkmate' ? `Checkmate — ${gameEnd.winner} wins`
+      : gameEnd.type === 'resign' ? `You resigned — ${gameEnd.winner} wins`
       : `Draw — ${gameEnd.reason}`;
   } else if (engineThinking || sideToMove !== playerColor) {
     statusText = 'Engine thinking…';
@@ -397,6 +437,13 @@ export default function App() {
           <div className="controls">
             <button className="btn btn-ghost" onClick={newGame}>New game</button>
             <button className="btn btn-ghost" onClick={undoMove} disabled={engineThinking || !moveHistory.length}>Undo</button>
+            <button
+              className={`btn ${confirmResign ? 'btn-danger' : 'btn-ghost'}`}
+              onClick={resign}
+              disabled={!!gameEnd}
+            >
+              {confirmResign ? 'Confirm resign?' : 'Resign'}
+            </button>
             <button
               className="btn btn-primary"
               onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')}
