@@ -20,6 +20,18 @@ const evaluator = new Evaluation();
 // moment a piece lands; the engine's deeper scores then refine it as they arrive.
 const staticEval = (board) => evaluator.evaluate(board);
 
+// Each game hands the player a random side.
+const randomColor = () => (Math.random() < 0.5 ? 'w' : 'b');
+
+// Index of the player's most recent move in the game's move list, or -1. White
+// makes the even-numbered half-moves, Black the odd ones.
+function lastPlayerMoveIndex(moveCount, playerColor) {
+  const parity = playerColor === 'w' ? 0 : 1;
+  let i = moveCount - 1;
+  if (i >= 0 && i % 2 !== parity) i--;
+  return i;
+}
+
 // What each side starts with, for the captured-material strip.
 const START_COUNTS = { p: 8, n: 2, b: 2, r: 2, q: 1 };
 const PIECE_VALUE  = { p: 1, n: 3, b: 3, r: 5, q: 9 };
@@ -112,7 +124,7 @@ export default function App() {
   const [telemetry, setTelemetry] = useState(null);
   const [logLines, setLogLines]   = useState([]);
   const [evalScore, setEvalScore] = useState(0);
-  const [playerColor, setPlayerColor] = useState('w');
+  const [playerColor, setPlayerColor] = useState(randomColor);
   const [pendingPromotion, setPendingPromotion] = useState(null); // { from, to, color }
   const [view, setView] = useState('play'); // 'play' | 'teach'
   const [confirmResign, setConfirmResign] = useState(false);
@@ -291,9 +303,11 @@ export default function App() {
     if (end.type === 'checkmate') setEvalScore(end.winner === 'White' ? MATE_SCORE : -MATE_SCORE);
   };
 
-  const newGame = () => {
+  // A fresh game, on a random side unless one is asked for.
+  const startGame = (color = randomColor()) => {
     searchIdRef.current++;
     setConfirmResign(false);
+    setPlayerColor(color);
     boardRef.current.reset();
     positionsRef.current = [boardRef.current.positionKey()];
     setSquares([...boardRef.current.squares]);
@@ -308,6 +322,8 @@ export default function App() {
     setEvalScore(0);
     setEngineThinking(false);
   };
+
+  const newGame = () => startGame();
 
   const resign = () => {
     if (gameEnd) return;
@@ -329,14 +345,12 @@ export default function App() {
   }, [confirmResign]);
 
   const undoMove = () => {
-    if (engineThinking || !moveHistory.length) return;
-    // Undo 2 half-moves (engine + player) or 1 if only 1 played
-    const count = Math.min(2, moveHistory.length);
-    for (let i = 0; i < count; i++) {
-      if (boardRef.current.history.length) boardRef.current.history.pop();
-    }
+    // Take back the player's last move and the engine's reply to it, if any, so it
+    // is the player's turn again. Playing Black, the engine's opening move stays.
+    const keep = lastPlayerMoveIndex(moveHistory.length, playerColor);
+    if (engineThinking || keep < 0) return;
     // Simplest approach: reset and replay
-    const replayMoves = moveHistory.slice(0, -count);
+    const replayMoves = moveHistory.slice(0, keep);
     boardRef.current.reset();
     const keys = [boardRef.current.positionKey()];
     for (const uci of replayMoves) {
@@ -448,7 +462,8 @@ export default function App() {
 
           <div className="controls">
             <button className="btn btn-ghost" onClick={newGame}>New game</button>
-            <button className="btn btn-ghost" onClick={undoMove} disabled={engineThinking || !moveHistory.length}>Undo</button>
+            <button className="btn btn-ghost" onClick={undoMove}
+              disabled={engineThinking || lastPlayerMoveIndex(moveHistory.length, playerColor) < 0}>Undo</button>
             <button
               className={`btn ${confirmResign ? 'btn-danger' : 'btn-ghost'}`}
               onClick={resign}
@@ -458,11 +473,11 @@ export default function App() {
             </button>
             <button
               className="btn btn-primary"
-              onClick={() => setPlayerColor(c => c === 'w' ? 'b' : 'w')}
-              disabled={engineThinking || (moveHistory.length > 0 && !gameEnd)}
-              title={(moveHistory.length > 0 && !gameEnd) ? 'Flip board is only available before a game starts or after it ends' : undefined}
+              onClick={() => startGame(engineColor)}
+              disabled={!gameEnd && lastPlayerMoveIndex(moveHistory.length, playerColor) >= 0}
+              title="Start a new game on the other side"
             >
-              Flip board
+              Play as {playerColor === 'w' ? 'Black' : 'White'}
             </button>
           </div>
         </section>

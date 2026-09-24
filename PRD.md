@@ -65,7 +65,7 @@ external GUIs.
 | # | Requirement | Status |
 |---|---|---|
 | P1 | Full legal move generation: sliding and stepping pieces, castling rights, en passant, promotion | Done |
-| P2 | Player may take either colour. *Flip board* swaps sides, and is disabled mid-game to avoid an inconsistent position | Done |
+| P2 | Each new game gives the player a random colour. *Play as White/Black* starts a fresh game on the other side, and is disabled once the player has moved | Done |
 | P3 | Click a piece to see its legal targets; hints render as a dot on an empty square and a ring on a capture | Done |
 | P4 | The previous move's origin and destination stay highlighted | Done |
 | P5 | A king in check is marked distinctly | Done |
