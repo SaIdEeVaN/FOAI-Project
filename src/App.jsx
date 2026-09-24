@@ -10,6 +10,7 @@ import EngineConsole from './components/EngineConsole.jsx';
 import TeachingMode from './components/TeachingMode.jsx';
 import { GameOverModal, PromotionModal } from './components/Modals.jsx';
 import { Piece, pieceName } from './components/PieceSymbols.jsx';
+import { formatScore, isMate, mateIn, MATE_SCORE } from './components/score.js';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -61,13 +62,16 @@ function EvalBar({ score, flip }) {
   const clamped  = Math.max(-800, Math.min(800, score));
   const whitePct = 50 + (clamped / 800) * 50;
   const whiteAhead = score >= 0;
-  const label = `${score === 0 ? '0.00' : `${score > 0 ? '+' : '−'}${(Math.abs(score) / 100).toFixed(2)}`} for White`;
+  const mate = isMate(score);
+  const winner = whiteAhead ? 'White' : 'Black';
+  const label = mate ? (mateIn(score) ? `${winner} mates in ${mateIn(score)}` : `checkmate, ${winner} wins`)
+                     : `${formatScore(score, { sign: true })} for White`;
 
   return (
-    <div className={`eval-bar${flip ? ' flipped' : ''}`} role="img" aria-label={`Evaluation ${label}`}>
+    <div className={`eval-bar${flip ? ' flipped' : ''}${mate ? ' mate' : ''}`} role="img" aria-label={`Evaluation: ${label}`}>
       <div className="eval-bar-white" style={{ height: `${whitePct}%` }} />
       <span className={`eval-bar-score ${whiteAhead ? 'on-white' : 'on-black'}`}>
-        {(Math.abs(score) / 100).toFixed(1)}
+        {formatScore(score, { decimals: 1 })}
       </span>
     </div>
   );
@@ -140,7 +144,7 @@ export default function App() {
     const { type, payload } = e.data;
     if ((type === 'progress' || type === 'result') && payload.id !== searchIdRef.current) return;
     if (type === 'progress') {
-      const line = `d${payload.depth}  score ${(payload.score/100).toFixed(2)}  nodes ${payload.nodes.toLocaleString()}  ${payload.move || ''}`;
+      const line = `d${payload.depth}  score ${formatScore(payload.score, { sign: true })}  nodes ${payload.nodes.toLocaleString()}  ${payload.move || ''}`;
       setLogLines(prev => [...prev.slice(-20), line]);
       setTelemetry(payload);
       // Live bar: each finished iteration is the engine's current opinion.
@@ -231,7 +235,7 @@ export default function App() {
     syncState();
 
     const end = detectGameEnd(boardRef.current, positionsRef.current);
-    if (end) { setGameEnd(end); return; }
+    if (end) { endGame(end); return; }
   };
 
   const requestEngine = useCallback(() => {
@@ -271,12 +275,20 @@ export default function App() {
     setLastMove({ from, to });
     setMoveHistory(prev => [...prev, payload.uci]);
     // The search scores from the mover's point of view; the bar reads from White's.
-    setEvalScore(playerColorRef.current === 'w' ? -payload.score : payload.score);
+    // A mate is one ply closer once the engine's move is on the board.
+    const score = isMate(payload.score) ? payload.score + Math.sign(payload.score) : payload.score;
+    setEvalScore(playerColorRef.current === 'w' ? -score : score);
     setTelemetry({ depth: payload.depth, nodes: payload.nodes, score: payload.score, move: payload.uci });
     syncState();
 
     const end = detectGameEnd(boardRef.current, positionsRef.current);
-    if (end) setGameEnd(end);
+    if (end) endGame(end);
+  };
+
+  // Checkmate pins the bar to the winner and labels it "#".
+  const endGame = (end) => {
+    setGameEnd(end);
+    if (end.type === 'checkmate') setEvalScore(end.winner === 'White' ? MATE_SCORE : -MATE_SCORE);
   };
 
   const newGame = () => {
