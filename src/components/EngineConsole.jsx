@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { formatScore } from './score.js';
 
 const fmtNodes = (n) => n.toLocaleString('en-US');
 
@@ -12,7 +13,7 @@ export default function EngineConsole({ telemetry, logLines, evalScore, thinking
   }, [logLines.length]);
 
   // evalScore: positive = White advantage (centipawns)
-  const scoreStr = evalScore === 0 ? '0.00' : `${evalScore > 0 ? '+' : '−'}${(Math.abs(evalScore) / 100).toFixed(2)}`;
+  const scoreStr = formatScore(evalScore, { sign: true });
   const scoreTone = evalScore === 0 ? '' : evalScore > 0 ? ' accent' : ' warn';
 
   const stats = [
