@@ -1,0 +1,9359 @@
+{
+ "maxDepth": 7,
+ "limitMs": 30000,
+ "positions": [
+  {
+   "name": "Start position",
+   "phase": "opening",
+   "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  },
+  {
+   "name": "Italian",
+   "phase": "opening",
+   "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"
+  },
+  {
+   "name": "Sicilian Najdorf",
+   "phase": "opening",
+   "fen": "rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6"
+  },
+  {
+   "name": "Queen's Gambit Declined",
+   "phase": "opening",
+   "fen": "rnbqk2r/ppp1bppp/4pn2/3p2B1/2PP4/2N5/PP2PPPP/R2QKBNR w KQkq - 4 5"
+  },
+  {
+   "name": "Kiwipete",
+   "phase": "middlegame",
+   "fen": "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+  },
+  {
+   "name": "Perft position 4",
+   "phase": "middlegame",
+   "fen": "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
+  },
+  {
+   "name": "Perft position 5",
+   "phase": "middlegame",
+   "fen": "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8"
+  },
+  {
+   "name": "Perft position 6",
+   "phase": "middlegame",
+   "fen": "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10"
+  },
+  {
+   "name": "Opera Game, mate in 2",
+   "phase": "tactic",
+   "fen": "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16",
+   "best": "b3b8"
+  },
+  {
+   "name": "Win at Chess #1",
+   "phase": "tactic",
+   "fen": "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1",
+   "best": "g3g6"
+  },
+  {
+   "name": "Win at Chess #4",
+   "phase": "tactic",
+   "fen": "r1bq2rk/pp3pbp/2p1p1pQ/7P/3P4/2PB1N2/PP3PPR/2KR4 w - - 0 1",
+   "best": "h6h7"
+  },
+  {
+   "name": "Suite FOAI-T.082 (Nd6)",
+   "phase": "tactic",
+   "fen": "2r5/3pkp1p/1p2p3/1N2P3/Rb2bp2/8/1Pn3PP/2K2B1R w - - 0 1",
+   "best": "b5d6"
+  },
+  {
+   "name": "Suite FOAI-T.085 (Bh3)",
+   "phase": "tactic",
+   "fen": "r3k2r/pp1N4/6p1/2p4p/4p1B1/2P5/P1P2PPP/4K2R w Kkq h6 0 1",
+   "best": "g4h3"
+  },
+  {
+   "name": "Rook endgame (perft 3)",
+   "phase": "endgame",
+   "fen": "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1"
+  },
+  {
+   "name": "Fine #70 (pawn endgame)",
+   "phase": "endgame",
+   "fen": "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1",
+   "best": "a1b1"
+  },
+  {
+   "name": "King and pawn",
+   "phase": "endgame",
+   "fen": "8/8/4k3/8/2K1P3/8/8/8 w - - 0 1"
+  },
+  {
+   "name": "Queen vs rook",
+   "phase": "endgame",
+   "fen": "8/8/8/3k4/8/4r3/8/2QK4 w - - 0 1"
+  }
+ ],
+ "configs": [
+  {
+   "id": "minimax",
+   "label": "Plain minimax",
+   "config": {
+    "alphaBeta": false,
+    "ordering": false,
+    "tt": false,
+    "quiescence": false,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "ab",
+   "label": "Alpha-beta",
+   "config": {
+    "alphaBeta": true,
+    "ordering": false,
+    "tt": false,
+    "quiescence": false,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "ab+ord",
+   "label": "+ MVV-LVA ordering",
+   "config": {
+    "alphaBeta": true,
+    "ordering": true,
+    "tt": false,
+    "quiescence": false,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "ab+tt",
+   "label": "+ TT",
+   "config": {
+    "alphaBeta": true,
+    "ordering": false,
+    "tt": true,
+    "quiescence": false,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "ab+ord+tt",
+   "label": "+ ordering + TT",
+   "config": {
+    "alphaBeta": true,
+    "ordering": true,
+    "tt": true,
+    "quiescence": false,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "ab+ord+tt+null",
+   "label": "+ ordering + TT + null-move",
+   "config": {
+    "alphaBeta": true,
+    "ordering": true,
+    "tt": true,
+    "quiescence": false,
+    "nullMove": true
+   }
+  },
+  {
+   "id": "ab+ord+tt+q",
+   "label": "+ ordering + TT + quiescence",
+   "config": {
+    "alphaBeta": true,
+    "ordering": true,
+    "tt": true,
+    "quiescence": true,
+    "nullMove": false
+   }
+  },
+  {
+   "id": "all",
+   "label": "Everything",
+   "config": {
+    "alphaBeta": true,
+    "ordering": true,
+    "tt": true,
+    "quiescence": true,
+    "nullMove": true
+   }
+  }
+ ],
+ "rows": [
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "minimax",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "minimax",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "minimax",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 421,
+   "timeMs": 16,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "minimax",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 1048,
+   "timeMs": 39,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "minimax",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 1234,
+   "timeMs": 29,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "minimax",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 1300,
+   "timeMs": 43,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 9323,
+   "timeMs": 149,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "minimax",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 32072,
+   "timeMs": 204,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "minimax",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 55234,
+   "timeMs": 284,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "minimax",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 46020,
+   "timeMs": 305,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 206604,
+   "timeMs": 607,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "minimax",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 1040115,
+   "timeMs": 3153,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "minimax",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 1500827,
+   "timeMs": 4337,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "minimax",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 1646450,
+   "timeMs": 4460,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 5072213,
+   "timeMs": 15024,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "minimax",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 10583040,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 440,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 3920,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 22995,
+   "timeMs": 118,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 329809,
+   "timeMs": 1021,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "minimax",
+   "depth": 5,
+   "move": "g5f4",
+   "score": 133,
+   "nodes": 10260480,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 147,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 2406,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 10063,
+   "timeMs": 69,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "minimax",
+   "depth": 5,
+   "move": "d4b3",
+   "score": 210,
+   "nodes": 10746880,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 1159,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 14667,
+   "timeMs": 54,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 167784,
+   "timeMs": 480,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 5,
+   "move": "d1a4",
+   "score": 251,
+   "nodes": 890764,
+   "timeMs": 5648,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 5,
+   "move": "c1g5",
+   "score": 286,
+   "nodes": 1245752,
+   "timeMs": 5384,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "minimax",
+   "depth": 6,
+   "move": "a2a4",
+   "score": -79,
+   "nodes": 10989568,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 126,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 1174,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 6,
+   "move": "c4d5",
+   "score": -58,
+   "nodes": 1008029,
+   "timeMs": 5411,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 7591,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 113360,
+   "timeMs": 420,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 6,
+   "move": "e2e3",
+   "score": -56,
+   "nodes": 1361270,
+   "timeMs": 5266,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -137,
+   "nodes": 3899185,
+   "timeMs": 21453,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab",
+   "depth": 6,
+   "move": "d4b3",
+   "score": -105,
+   "nodes": 9647104,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 293,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 5586,
+   "timeMs": 33,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 35677,
+   "timeMs": 260,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "c1g5",
+   "score": 286,
+   "nodes": 451197,
+   "timeMs": 2367,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab",
+   "depth": 7,
+   "move": "g5f6",
+   "score": 84,
+   "nodes": 5108736,
+   "timeMs": 30003,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 139,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 1620,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 5106,
+   "timeMs": 48,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "d1a4",
+   "score": 251,
+   "nodes": 206052,
+   "timeMs": 1301,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "c4d5",
+   "score": -58,
+   "nodes": 255135,
+   "timeMs": 2698,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab",
+   "depth": 7,
+   "move": "d2d4",
+   "score": 86,
+   "nodes": 8089600,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 126,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 1165,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 6608,
+   "timeMs": 31,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 72019,
+   "timeMs": 338,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "e2e3",
+   "score": -56,
+   "nodes": 685844,
+   "timeMs": 3585,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab",
+   "depth": 7,
+   "move": "d8e7",
+   "score": 83,
+   "nodes": 8870912,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 297,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 2330,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 13848,
+   "timeMs": 84,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 64306,
+   "timeMs": 369,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "c1g5",
+   "score": -3,
+   "nodes": 1967694,
+   "timeMs": 14660,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -137,
+   "nodes": 1433485,
+   "timeMs": 9059,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "c4c5",
+   "score": 102,
+   "nodes": 4728832,
+   "timeMs": 30005,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 147,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 2406,
+   "timeMs": 19,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 9534,
+   "timeMs": 80,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "b1c3",
+   "score": 111,
+   "nodes": 5307290,
+   "timeMs": 28612,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 126,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 1174,
+   "timeMs": 18,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 7370,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 85004,
+   "timeMs": 383,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "d1a4",
+   "score": 251,
+   "nodes": 704169,
+   "timeMs": 4583,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "d4b3",
+   "score": 212,
+   "nodes": 5269504,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 1159,
+   "timeMs": 18,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 14667,
+   "timeMs": 58,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "e2e3",
+   "score": -56,
+   "nodes": 915729,
+   "timeMs": 3634,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "c4d5",
+   "score": -58,
+   "nodes": 756431,
+   "timeMs": 3719,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 140021,
+   "timeMs": 487,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "d8f6",
+   "score": 118,
+   "nodes": 4078388,
+   "timeMs": 27082,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 440,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 3920,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 21393,
+   "timeMs": 126,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "c1g5",
+   "score": 286,
+   "nodes": 957026,
+   "timeMs": 4280,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 255058,
+   "timeMs": 806,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -137,
+   "nodes": 2555798,
+   "timeMs": 13972,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "b1c3",
+   "score": 111,
+   "nodes": 7324211,
+   "timeMs": 29678,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 126,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 1165,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 6399,
+   "timeMs": 39,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 58390,
+   "timeMs": 277,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "g5f6",
+   "score": 84,
+   "nodes": 5089280,
+   "timeMs": 30003,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 139,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 1620,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 4803,
+   "timeMs": 47,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "d1a4",
+   "score": 251,
+   "nodes": 165521,
+   "timeMs": 1161,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "c1g5",
+   "score": -3,
+   "nodes": 8383291,
+   "timeMs": 27873,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "e2e3",
+   "score": -56,
+   "nodes": 474557,
+   "timeMs": 2579,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "c4d5",
+   "score": -58,
+   "nodes": 161866,
+   "timeMs": 1575,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "d8f6",
+   "score": 118,
+   "nodes": 8761344,
+   "timeMs": 30003,
+   "aborted": true
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 297,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 2330,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 13527,
+   "timeMs": 87,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 55422,
+   "timeMs": 319,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "b1c3",
+   "score": 111,
+   "nodes": 3042905,
+   "timeMs": 17277,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 21,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 126,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 1165,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 6399,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "e2e4",
+   "score": 74,
+   "nodes": 55252,
+   "timeMs": 289,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "e2e3",
+   "score": -56,
+   "nodes": 404167,
+   "timeMs": 2256,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -137,
+   "nodes": 1003674,
+   "timeMs": 6529,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "d4b5",
+   "score": 75,
+   "nodes": 6491136,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 293,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 5586,
+   "timeMs": 53,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 34209,
+   "timeMs": 259,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "c4c5",
+   "score": 102,
+   "nodes": 4227072,
+   "timeMs": 30007,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 317,
+   "nodes": 39,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 139,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "c4d5",
+   "score": 341,
+   "nodes": 1620,
+   "timeMs": 22,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "c4d5",
+   "score": -17,
+   "nodes": 4803,
+   "timeMs": 71,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "d1a4",
+   "score": 251,
+   "nodes": 164233,
+   "timeMs": 1145,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "c1g5",
+   "score": 286,
+   "nodes": 352563,
+   "timeMs": 1954,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "c4d5",
+   "score": -58,
+   "nodes": 143166,
+   "timeMs": 1462,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "b1c3",
+   "score": 111,
+   "nodes": 2339531,
+   "timeMs": 13662,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 41,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 235,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 2258,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 11889,
+   "timeMs": 81,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "d2d4",
+   "score": 48,
+   "nodes": 79813,
+   "timeMs": 411,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "d2d4",
+   "score": 0,
+   "nodes": 413560,
+   "timeMs": 3255,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "d8f6",
+   "score": 118,
+   "nodes": 2732940,
+   "timeMs": 18469,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 32,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -128,
+   "nodes": 297,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "d8f6",
+   "score": 147,
+   "nodes": 2330,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -136,
+   "nodes": 13527,
+   "timeMs": 83,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "d8f6",
+   "score": 132,
+   "nodes": 34335,
+   "timeMs": 261,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "c1g5",
+   "score": -3,
+   "nodes": 1419713,
+   "timeMs": 10708,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -137,
+   "nodes": 930054,
+   "timeMs": 5989,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "d2d4",
+   "score": 28,
+   "nodes": 3070196,
+   "timeMs": 17525,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 1,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 41,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 2,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 235,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 3,
+   "move": "b1c3",
+   "score": 60,
+   "nodes": 2258,
+   "timeMs": 20,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 4,
+   "move": "b1c3",
+   "score": 0,
+   "nodes": 11889,
+   "timeMs": 85,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 5,
+   "move": "d2d4",
+   "score": 48,
+   "nodes": 79029,
+   "timeMs": 366,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 6,
+   "move": "d2d4",
+   "score": 0,
+   "nodes": 375856,
+   "timeMs": 3005,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "d8f6",
+   "score": 118,
+   "nodes": 1860190,
+   "timeMs": 13386,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 105,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -28,
+   "nodes": 1458,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "f8c5",
+   "score": 0,
+   "nodes": 17757,
+   "timeMs": 235,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "b2b4",
+   "score": 104,
+   "nodes": 4090880,
+   "timeMs": 30010,
+   "aborted": true
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "e2e3",
+   "score": -7,
+   "nodes": 250,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 849,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -6,
+   "nodes": 101393,
+   "timeMs": 899,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "e2e3",
+   "score": -7,
+   "nodes": 6929,
+   "timeMs": 66,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 32031,
+   "timeMs": 550,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "g5f6",
+   "score": 44,
+   "nodes": 105606,
+   "timeMs": 395,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "f8c5",
+   "score": 0,
+   "nodes": 543462,
+   "timeMs": 6491,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "a2a3",
+   "score": 213,
+   "nodes": 5142528,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "f1a6",
+   "score": 253,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "f1c4",
+   "score": -4,
+   "nodes": 293,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "c1g5",
+   "score": 289,
+   "nodes": 5586,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "c1g5",
+   "score": -30,
+   "nodes": 34209,
+   "timeMs": 242,
+   "aborted": false
+  },
+  {
+   "position": "Start position",
+   "config": "all",
+   "depth": 7,
+   "move": "d2d4",
+   "score": 28,
+   "nodes": 2671234,
+   "timeMs": 15299,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "minimax",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "minimax",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 2088,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "minimax",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 99950,
+   "timeMs": 464,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "c1g5",
+   "score": 286,
+   "nodes": 318537,
+   "timeMs": 1917,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 851102,
+   "timeMs": 13615,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "c1g5",
+   "score": -3,
+   "nodes": 1276619,
+   "timeMs": 9751,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "minimax",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 4185553,
+   "timeMs": 11443,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -24,
+   "nodes": 3531776,
+   "timeMs": 30011,
+   "aborted": true
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 1,
+   "move": "g8f6",
+   "score": 32,
+   "nodes": 105,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 2,
+   "move": "g8f6",
+   "score": -28,
+   "nodes": 1458,
+   "timeMs": 24,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 3,
+   "move": "f8c5",
+   "score": 0,
+   "nodes": 17757,
+   "timeMs": 188,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "c4d5",
+   "score": -11,
+   "nodes": 4082682,
+   "timeMs": 22831,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 1,
+   "move": "e2e3",
+   "score": -7,
+   "nodes": 250,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 849,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 3,
+   "move": "e2e3",
+   "score": -7,
+   "nodes": 6929,
+   "timeMs": 51,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 4,
+   "move": "g8f6",
+   "score": -6,
+   "nodes": 101393,
+   "timeMs": 893,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 4,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 32031,
+   "timeMs": 560,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 5,
+   "move": "g5f6",
+   "score": 44,
+   "nodes": 56303,
+   "timeMs": 286,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 5,
+   "move": "f8c5",
+   "score": 0,
+   "nodes": 533337,
+   "timeMs": 6502,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 6,
+   "move": "g5f6",
+   "score": -16,
+   "nodes": 709638,
+   "timeMs": 11446,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "a2a3",
+   "score": 213,
+   "nodes": 4783104,
+   "timeMs": 30003,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "f1c4",
+   "score": 156,
+   "nodes": 169,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "f1c4",
+   "score": 113,
+   "nodes": 1138,
+   "timeMs": 15,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 104,
+   "nodes": 26209,
+   "timeMs": 270,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "minimax",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 10487808,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 990,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 20180,
+   "timeMs": 86,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "c1g5",
+   "score": 88,
+   "nodes": 140460,
+   "timeMs": 1570,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 529808,
+   "timeMs": 1927,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "f1c4",
+   "score": 104,
+   "nodes": 1077389,
+   "timeMs": 9620,
+   "aborted": false
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "config": "all",
+   "depth": 7,
+   "move": "c4d5",
+   "score": -11,
+   "nodes": 2433104,
+   "timeMs": 15403,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "minimax",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "minimax",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 271,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "minimax",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 9738,
+   "timeMs": 64,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "minimax",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 432071,
+   "timeMs": 1224,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 6,
+   "move": "g8f6",
+   "score": -24,
+   "nodes": 3217675,
+   "timeMs": 27374,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 6644725,
+   "timeMs": 28052,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "d4f3",
+   "score": 70,
+   "nodes": 2762752,
+   "timeMs": 30011,
+   "aborted": true
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 1,
+   "move": "f1c4",
+   "score": 156,
+   "nodes": 169,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 2,
+   "move": "f1c4",
+   "score": 113,
+   "nodes": 1138,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 104,
+   "nodes": 26209,
+   "timeMs": 263,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 4,
+   "move": "c1g5",
+   "score": 88,
+   "nodes": 140460,
+   "timeMs": 1490,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "minimax",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 10431488,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 259,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 3188,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 94551,
+   "timeMs": 331,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 508080,
+   "timeMs": 2759,
+   "aborted": false
+  },
+  {
+   "position": "Italian",
+   "config": "all",
+   "depth": 7,
+   "move": "a8b8",
+   "score": -73,
+   "nodes": 2613248,
+   "timeMs": 30004,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 5",
+   "config": "minimax",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "minimax",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 1531,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "minimax",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 63910,
+   "timeMs": 242,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 5,
+   "move": "f1c4",
+   "score": 104,
+   "nodes": 1078354,
+   "timeMs": 9416,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "minimax",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 2167397,
+   "timeMs": 5662,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab",
+   "depth": 6,
+   "move": "d5e6",
+   "score": -128,
+   "nodes": 7628800,
+   "timeMs": 30005,
+   "aborted": true
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 132,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 2475,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 6916,
+   "timeMs": 102,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 74871,
+   "timeMs": 524,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "e2a6",
+   "score": -79,
+   "nodes": 207120,
+   "timeMs": 3079,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "e2a6",
+   "score": 262,
+   "nodes": 2075634,
+   "timeMs": 12978,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 990,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 20180,
+   "timeMs": 93,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab",
+   "depth": 6,
+   "move": "c4c5",
+   "score": -723,
+   "nodes": 9861120,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 96,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 564,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 8325,
+   "timeMs": 61,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 19940,
+   "timeMs": 234,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 475476,
+   "timeMs": 1742,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "g1h1",
+   "score": -641,
+   "nodes": 247493,
+   "timeMs": 1470,
+   "aborted": false
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "config": "all",
+   "depth": 6,
+   "move": "d4f3",
+   "score": 70,
+   "nodes": 2648064,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "minimax",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "minimax",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 2126,
+   "timeMs": 48,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "minimax",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 92016,
+   "timeMs": 310,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "c4c5",
+   "score": -297,
+   "nodes": 327581,
+   "timeMs": 5105,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 259,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 3188,
+   "timeMs": 21,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 93579,
+   "timeMs": 296,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "minimax",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 10905600,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 125,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 2253,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 14927,
+   "timeMs": 95,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 233288,
+   "timeMs": 1196,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 458072,
+   "timeMs": 2670,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 327,
+   "nodes": 1344036,
+   "timeMs": 6756,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "minimax",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 3986610,
+   "timeMs": 11415,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 4902919,
+   "timeMs": 21033,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "c4c5",
+   "score": -723,
+   "nodes": 9606144,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 96,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 564,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 8052,
+   "timeMs": 44,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 18230,
+   "timeMs": 213,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "g1h1",
+   "score": -641,
+   "nodes": 164353,
+   "timeMs": 1059,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "c4c5",
+   "score": -297,
+   "nodes": 201612,
+   "timeMs": 2804,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "d2d4",
+   "score": 201,
+   "nodes": 7,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "d2d4",
+   "score": -1059,
+   "nodes": 96,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "d2d4",
+   "score": -183,
+   "nodes": 564,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "g1h1",
+   "score": -613,
+   "nodes": 8052,
+   "timeMs": 47,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "d2d4",
+   "score": -240,
+   "nodes": 18240,
+   "timeMs": 240,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "g1h1",
+   "score": -641,
+   "nodes": 162124,
+   "timeMs": 1055,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab",
+   "depth": 7,
+   "move": null,
+   "score": null,
+   "nodes": 7166976,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 119,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 2050,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 3742,
+   "timeMs": 50,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 65291,
+   "timeMs": 253,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "minimax",
+   "depth": 5,
+   "move": "g5f6",
+   "score": 126,
+   "nodes": 10345472,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 626,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 14364,
+   "timeMs": 78,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "c4c5",
+   "score": -297,
+   "nodes": 124109,
+   "timeMs": 1627,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 684,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 854,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 3486,
+   "timeMs": 50,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 10320,
+   "timeMs": 78,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 203037,
+   "timeMs": 797,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "c4c5",
+   "score": -412,
+   "nodes": 60279,
+   "timeMs": 474,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 327,
+   "nodes": 143718,
+   "timeMs": 1959,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "c4c5",
+   "score": -412,
+   "nodes": 211917,
+   "timeMs": 1111,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "d5e6",
+   "score": -128,
+   "nodes": 7433216,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 132,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 2475,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 6342,
+   "timeMs": 83,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 51346,
+   "timeMs": 381,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "e2a6",
+   "score": -79,
+   "nodes": 136853,
+   "timeMs": 1900,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 283,
+   "nodes": 1445842,
+   "timeMs": 7797,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "c4c5",
+   "score": -458,
+   "nodes": 875125,
+   "timeMs": 7051,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 1,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 684,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 2,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 854,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 3,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 3486,
+   "timeMs": 28,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 4,
+   "move": "c4c5",
+   "score": -325,
+   "nodes": 10320,
+   "timeMs": 55,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "d7c8q",
+   "score": 556,
+   "nodes": 2325324,
+   "timeMs": 8213,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 125,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 5,
+   "move": "c4c5",
+   "score": -412,
+   "nodes": 60347,
+   "timeMs": 422,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 2127,
+   "timeMs": 16,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 13914,
+   "timeMs": 92,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 6,
+   "move": "c4c5",
+   "score": -412,
+   "nodes": 141966,
+   "timeMs": 895,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 164615,
+   "timeMs": 941,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 327,
+   "nodes": 1002999,
+   "timeMs": 4304,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "e2a6",
+   "score": 262,
+   "nodes": 1014515,
+   "timeMs": 7293,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "f3f6",
+   "score": 467,
+   "nodes": 49,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 132,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 474,
+   "nodes": 2475,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 66,
+   "nodes": 6342,
+   "timeMs": 144,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 4",
+   "config": "all",
+   "depth": 7,
+   "move": "c4c5",
+   "score": -458,
+   "nodes": 636297,
+   "timeMs": 5155,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "minimax",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "minimax",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 1415,
+   "timeMs": 33,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 381,
+   "nodes": 51441,
+   "timeMs": 387,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "minimax",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 60145,
+   "timeMs": 210,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "e2a6",
+   "score": -79,
+   "nodes": 87002,
+   "timeMs": 1379,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "minimax",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 1816103,
+   "timeMs": 4085,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "e2a6",
+   "score": 262,
+   "nodes": 475146,
+   "timeMs": 3285,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 887,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 1953,
+   "timeMs": 21,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 118,
+   "nodes": 9208,
+   "timeMs": 72,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 118,
+   "nodes": 26646,
+   "timeMs": 281,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 58,
+   "nodes": 218832,
+   "timeMs": 2160,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "e2a6",
+   "score": 48,
+   "nodes": 501473,
+   "timeMs": 4554,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab",
+   "depth": 6,
+   "move": "g5f6",
+   "score": -247,
+   "nodes": 8810496,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 136,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 2233,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 19755,
+   "timeMs": 146,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 283,
+   "nodes": 149134,
+   "timeMs": 800,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": null,
+   "score": null,
+   "nodes": 6676480,
+   "timeMs": 30007,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 119,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 2008,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 3201,
+   "timeMs": 37,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 37928,
+   "timeMs": 143,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 327,
+   "nodes": 70311,
+   "timeMs": 840,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "e2a6",
+   "score": 12,
+   "nodes": 2767303,
+   "timeMs": 18543,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 1,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 887,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 2,
+   "move": "e2a6",
+   "score": 128,
+   "nodes": 1953,
+   "timeMs": 32,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 3,
+   "move": "e2a6",
+   "score": 118,
+   "nodes": 9208,
+   "timeMs": 69,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 4,
+   "move": "e2a6",
+   "score": 118,
+   "nodes": 26646,
+   "timeMs": 243,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 5,
+   "move": "d5e6",
+   "score": 58,
+   "nodes": 218539,
+   "timeMs": 2041,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "d7c8q",
+   "score": 556,
+   "nodes": 673259,
+   "timeMs": 2757,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 1067,
+   "nodes": 45,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 182,
+   "nodes": 119,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 534,
+   "nodes": 2008,
+   "timeMs": 27,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 225,
+   "nodes": 3201,
+   "timeMs": 68,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 37877,
+   "timeMs": 168,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 327,
+   "nodes": 22604,
+   "timeMs": 266,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "d7c8q",
+   "score": 556,
+   "nodes": 124292,
+   "timeMs": 679,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 117,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 465,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 3691,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "minimax",
+   "depth": 5,
+   "move": "g5f4",
+   "score": -22,
+   "nodes": 13059072,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 470,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 483,
+   "nodes": 9310,
+   "timeMs": 96,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 16327,
+   "timeMs": 51,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 73124,
+   "timeMs": 186,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 73805,
+   "timeMs": 235,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 6,
+   "move": "e2a6",
+   "score": 48,
+   "nodes": 360810,
+   "timeMs": 3438,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 491,
+   "nodes": 182552,
+   "timeMs": 1889,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "c3d5",
+   "score": -134,
+   "nodes": 1833452,
+   "timeMs": 14273,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 1005438,
+   "timeMs": 3654,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "d7c8q",
+   "score": 531,
+   "nodes": 1299420,
+   "timeMs": 3591,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 1,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 117,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 2,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 465,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 3,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 3691,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 4,
+   "move": "d7c8q",
+   "score": 483,
+   "nodes": 9310,
+   "timeMs": 93,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 5,
+   "move": "d7c8q",
+   "score": 523,
+   "nodes": 45650,
+   "timeMs": 159,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 6,
+   "move": "d7c8q",
+   "score": 491,
+   "nodes": 174382,
+   "timeMs": 1733,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 5",
+   "config": "all",
+   "depth": 7,
+   "move": "d7c8q",
+   "score": 531,
+   "nodes": 243839,
+   "timeMs": 1300,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "minimax",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "minimax",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 2049,
+   "timeMs": 53,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "minimax",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 111733,
+   "timeMs": 307,
+   "aborted": false
+  },
+  {
+   "position": "Kiwipete",
+   "config": "all",
+   "depth": 7,
+   "move": "e2a6",
+   "score": 12,
+   "nodes": 1657291,
+   "timeMs": 11580,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "minimax",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "minimax",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 1358,
+   "timeMs": 35,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "minimax",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 55197,
+   "timeMs": 199,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "minimax",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 1659878,
+   "timeMs": 3995,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "minimax",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 3925706,
+   "timeMs": 9100,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 6903718,
+   "timeMs": 22581,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "g5h4",
+   "score": 52,
+   "nodes": 3988480,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 626,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 14364,
+   "timeMs": 112,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 177898,
+   "timeMs": 714,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 283,
+   "nodes": 1100547,
+   "timeMs": 6141,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "minimax",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 11835392,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 605,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 9915,
+   "timeMs": 50,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 4129,
+   "timeMs": 38,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 87948,
+   "timeMs": 251,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "minimax",
+   "depth": 5,
+   "move": "f6e8",
+   "score": 51,
+   "nodes": 12018688,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 875,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 7630,
+   "timeMs": 29,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 71822,
+   "timeMs": 274,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 239556,
+   "timeMs": 1764,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 766780,
+   "timeMs": 3177,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab",
+   "depth": 7,
+   "move": "g5f6",
+   "score": -451,
+   "nodes": 7525376,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 94,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 1653,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 3518,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 50511,
+   "timeMs": 207,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 106523,
+   "timeMs": 1242,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 3814122,
+   "timeMs": 11589,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 153,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 793,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 1303,
+   "timeMs": 16,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 19861,
+   "timeMs": 80,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 38335,
+   "timeMs": 480,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 1092549,
+   "timeMs": 4346,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 470,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 16327,
+   "timeMs": 54,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 62352,
+   "timeMs": 218,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 703839,
+   "timeMs": 2774,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 605,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 9915,
+   "timeMs": 67,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 3448,
+   "timeMs": 31,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 50605,
+   "timeMs": 162,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 748342,
+   "timeMs": 2979,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 129507,
+   "timeMs": 646,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 2737461,
+   "timeMs": 15749,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 977814,
+   "timeMs": 3352,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 153,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 793,
+   "timeMs": 20,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 1163,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 16586,
+   "timeMs": 69,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 28943,
+   "timeMs": 342,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "g5f6",
+   "score": -247,
+   "nodes": 8556544,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 136,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 2233,
+   "timeMs": 25,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 19288,
+   "timeMs": 146,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 389862,
+   "timeMs": 1696,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "h6g7",
+   "score": 410,
+   "nodes": 44,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "h6e3",
+   "score": -63,
+   "nodes": 153,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "h6f4",
+   "score": 155,
+   "nodes": 793,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 1163,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 6968,
+   "timeMs": 35,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 283,
+   "nodes": 123126,
+   "timeMs": 717,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 12453,
+   "timeMs": 124,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 100326,
+   "timeMs": 546,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "h6f4",
+   "score": 68,
+   "nodes": 225,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "h6e3",
+   "score": 80,
+   "nodes": 1676,
+   "timeMs": 31,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "h6e3",
+   "score": 80,
+   "nodes": 3591,
+   "timeMs": 38,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 4819,
+   "timeMs": 54,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 34410,
+   "timeMs": 92,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 124054,
+   "timeMs": 1486,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 817620,
+   "timeMs": 2593,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 1,
+   "move": "h6f4",
+   "score": 68,
+   "nodes": 225,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 2,
+   "move": "h6e3",
+   "score": 80,
+   "nodes": 1676,
+   "timeMs": 24,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 3,
+   "move": "h6e3",
+   "score": 80,
+   "nodes": 3591,
+   "timeMs": 36,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 4,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 4819,
+   "timeMs": 54,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 5,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 16011,
+   "timeMs": 63,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 6,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 75485,
+   "timeMs": 944,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 3603084,
+   "timeMs": 13052,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #4",
+   "config": "all",
+   "depth": 7,
+   "move": "h6h7",
+   "score": 19997,
+   "nodes": 210084,
+   "timeMs": 1141,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "minimax",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "minimax",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 1093,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "minimax",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 26676,
+   "timeMs": 112,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "minimax",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 1024092,
+   "timeMs": 2365,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "c3d5",
+   "score": -134,
+   "nodes": 1399201,
+   "timeMs": 11074,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab",
+   "depth": 7,
+   "move": "f6e8",
+   "score": 86,
+   "nodes": 6097920,
+   "timeMs": 30003,
+   "aborted": true
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 192,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 2881,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 8165,
+   "timeMs": 130,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 152706,
+   "timeMs": 720,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 343201,
+   "timeMs": 4545,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "g5e7",
+   "score": -365,
+   "nodes": 7438336,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 94,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 1653,
+   "timeMs": 20,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 3165,
+   "timeMs": 36,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 39310,
+   "timeMs": 179,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 79425,
+   "timeMs": 892,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "minimax",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 12343296,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 804,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 6779,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 96446,
+   "timeMs": 268,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "c4d5",
+   "score": 134,
+   "nodes": 4096000,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "g5f6",
+   "score": 342,
+   "nodes": 47,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "g5f6",
+   "score": -8,
+   "nodes": 136,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 242,
+   "nodes": 2233,
+   "timeMs": 23,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "e2d1",
+   "score": -120,
+   "nodes": 19288,
+   "timeMs": 155,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 674280,
+   "timeMs": 3022,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 864,
+   "nodes": 47,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 94,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 381,
+   "nodes": 1653,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 3165,
+   "timeMs": 44,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 29059,
+   "timeMs": 145,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 461221,
+   "timeMs": 1563,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 283,
+   "nodes": 118716,
+   "timeMs": 706,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 54381,
+   "timeMs": 651,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 272219,
+   "timeMs": 1377,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 103,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 429,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 69,
+   "nodes": 3727,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 8643,
+   "timeMs": 102,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 70402,
+   "timeMs": 216,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 195899,
+   "timeMs": 2232,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 120,
+   "nodes": 2015127,
+   "timeMs": 6619,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 1562250,
+   "timeMs": 5262,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 1,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 103,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 2,
+   "move": "b3e6",
+   "score": 39,
+   "nodes": 429,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 3,
+   "move": "b3e6",
+   "score": 69,
+   "nodes": 3727,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 4,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 8643,
+   "timeMs": 98,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 5,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 21387,
+   "timeMs": 52,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "c3d5",
+   "score": -134,
+   "nodes": 1232822,
+   "timeMs": 10201,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 6,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 135547,
+   "timeMs": 1588,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 5315560,
+   "timeMs": 21501,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 875,
+   "timeMs": 16,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 7630,
+   "timeMs": 32,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 64980,
+   "timeMs": 269,
+   "aborted": false
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "config": "all",
+   "depth": 7,
+   "move": "b3b8",
+   "score": 19997,
+   "nodes": 646019,
+   "timeMs": 2749,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 605355,
+   "timeMs": 2498,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 570,
+   "timeMs": 24,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 15280,
+   "timeMs": 102,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 308995,
+   "timeMs": 721,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 1896476,
+   "timeMs": 10555,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "c3d5",
+   "score": 247,
+   "nodes": 3007670,
+   "timeMs": 22206,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "g5e3",
+   "score": 9,
+   "nodes": 636,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 3185,
+   "timeMs": 46,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 14580,
+   "timeMs": 166,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 8065282,
+   "timeMs": 18378,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 53477,
+   "timeMs": 726,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 124,
+   "nodes": 189322,
+   "timeMs": 1215,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 311,
+   "nodes": 8010752,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 211,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 859,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 9878,
+   "timeMs": 87,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 26984,
+   "timeMs": 194,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 120,
+   "nodes": 129317,
+   "timeMs": 883,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 311,
+   "nodes": 627756,
+   "timeMs": 4333,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 804,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 6779,
+   "timeMs": 26,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 81828,
+   "timeMs": 245,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 325695,
+   "timeMs": 1290,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 120,
+   "nodes": 1217537,
+   "timeMs": 3814,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "c3d5",
+   "score": 114,
+   "nodes": 1340254,
+   "timeMs": 15953,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "f6e8",
+   "score": 86,
+   "nodes": 6597632,
+   "timeMs": 30001,
+   "aborted": true
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 192,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 2881,
+   "timeMs": 27,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 7594,
+   "timeMs": 101,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 111848,
+   "timeMs": 527,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 230396,
+   "timeMs": 2905,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "minimax",
+   "depth": 6,
+   "move": "d7f8",
+   "score": -322,
+   "nodes": 13637632,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 169,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 2550,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 19182,
+   "timeMs": 74,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 170754,
+   "timeMs": 558,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 6,
+   "move": "g4e6",
+   "score": 132,
+   "nodes": 1189004,
+   "timeMs": 4022,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 2462975,
+   "timeMs": 11468,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "e5c6",
+   "score": 59,
+   "nodes": 60,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "e5f7",
+   "score": -511,
+   "nodes": 192,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "e5f7",
+   "score": 399,
+   "nodes": 2881,
+   "timeMs": 19,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 7594,
+   "timeMs": 128,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 56028,
+   "timeMs": 382,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 136983,
+   "timeMs": 1707,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 848185,
+   "timeMs": 4983,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "e5c6",
+   "score": -287,
+   "nodes": 499,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "e5c6",
+   "score": -287,
+   "nodes": 765,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "f6g4",
+   "score": -293,
+   "nodes": 7361,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 311,
+   "nodes": 8074240,
+   "timeMs": 30002,
+   "aborted": true
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 26645,
+   "timeMs": 324,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 211,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 859,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 9267,
+   "timeMs": 94,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 22401,
+   "timeMs": 176,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 213251,
+   "timeMs": 642,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 120,
+   "nodes": 108583,
+   "timeMs": 691,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "g5f6",
+   "score": -23,
+   "nodes": 2712576,
+   "timeMs": 30009,
+   "aborted": true
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 1,
+   "move": "g5e3",
+   "score": 9,
+   "nodes": 636,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 2,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 3185,
+   "timeMs": 43,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 3,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 14580,
+   "timeMs": 167,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 311,
+   "nodes": 379308,
+   "timeMs": 3016,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "a4b4",
+   "score": 323,
+   "nodes": 26,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "c1b1",
+   "score": -79,
+   "nodes": 211,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "b5a7",
+   "score": 269,
+   "nodes": 859,
+   "timeMs": 9,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "b5d6",
+   "score": -102,
+   "nodes": 9267,
+   "timeMs": 73,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 265,
+   "nodes": 19532,
+   "timeMs": 136,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 4,
+   "move": "c3d5",
+   "score": 118,
+   "nodes": 53477,
+   "timeMs": 732,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 120,
+   "nodes": 58538,
+   "timeMs": 426,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 5,
+   "move": "c3d5",
+   "score": 124,
+   "nodes": 104712,
+   "timeMs": 702,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 311,
+   "nodes": 206607,
+   "timeMs": 1880,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "c1b1",
+   "score": 37,
+   "nodes": 67,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "c1b1",
+   "score": 11,
+   "nodes": 696,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "b5d6",
+   "score": -4,
+   "nodes": 6174,
+   "timeMs": 45,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "b5d6",
+   "score": 245,
+   "nodes": 10093,
+   "timeMs": 80,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 255,
+   "nodes": 50303,
+   "timeMs": 405,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 658055,
+   "timeMs": 6604,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 241,
+   "nodes": 224803,
+   "timeMs": 1424,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 255,
+   "nodes": 985486,
+   "timeMs": 7785,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 1,
+   "move": "c1b1",
+   "score": 37,
+   "nodes": 67,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 2,
+   "move": "c1b1",
+   "score": 11,
+   "nodes": 696,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 3,
+   "move": "b5d6",
+   "score": -4,
+   "nodes": 6174,
+   "timeMs": 44,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 4,
+   "move": "b5d6",
+   "score": 245,
+   "nodes": 10093,
+   "timeMs": 76,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 5,
+   "move": "b5d6",
+   "score": 255,
+   "nodes": 34506,
+   "timeMs": 295,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 6,
+   "move": "c3d5",
+   "score": 114,
+   "nodes": 1030634,
+   "timeMs": 12317,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 6,
+   "move": "b5d6",
+   "score": 241,
+   "nodes": 171143,
+   "timeMs": 1022,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab",
+   "depth": 7,
+   "move": "g4e6",
+   "score": 195,
+   "nodes": 8330240,
+   "timeMs": 30004,
+   "aborted": true
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 79,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 806,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 2778,
+   "timeMs": 20,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 25483,
+   "timeMs": 95,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "g4e6",
+   "score": 132,
+   "nodes": 83669,
+   "timeMs": 598,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 248,
+   "nodes": 664891,
+   "timeMs": 2601,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 169,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 2550,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 17531,
+   "timeMs": 74,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 5167275,
+   "timeMs": 17187,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 1,
+   "move": "e5c6",
+   "score": -287,
+   "nodes": 499,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 2,
+   "move": "e5c6",
+   "score": -287,
+   "nodes": 765,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 3,
+   "move": "f6g4",
+   "score": -293,
+   "nodes": 7361,
+   "timeMs": 38,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 135403,
+   "timeMs": 472,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "config": "all",
+   "depth": 7,
+   "move": "b5d6",
+   "score": 255,
+   "nodes": 698922,
+   "timeMs": 6786,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 206,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 3018,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 4,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 26645,
+   "timeMs": 298,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 46256,
+   "timeMs": 111,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 5,
+   "move": "f6e8",
+   "score": -69,
+   "nodes": 48337,
+   "timeMs": 271,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 720880,
+   "timeMs": 1267,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "g4e6",
+   "score": 132,
+   "nodes": 851114,
+   "timeMs": 2883,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 6,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 431036,
+   "timeMs": 4459,
+   "aborted": false
+  },
+  {
+   "position": "Win at Chess #1",
+   "config": "all",
+   "depth": 7,
+   "move": "g3g6",
+   "score": 19997,
+   "nodes": 1862932,
+   "timeMs": 9662,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 19,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 109,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 505,
+   "timeMs": 15,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 2595,
+   "timeMs": 60,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 13140,
+   "timeMs": 40,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "minimax",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 74781,
+   "timeMs": 149,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 11,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 33,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 119,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 317,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 524,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 1213,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 11,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 33,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 119,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 317,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 524,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 1213,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 11,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 33,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 106,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 180,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 215,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 274,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 11,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 33,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 106,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 180,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 227,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 276,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 4,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 11,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 33,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 106,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 180,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 227,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 276,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 7,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 18,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 55,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 167,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 289,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 319,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 369,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 1,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 7,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 2,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 18,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 3,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 55,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 4,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 167,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 5,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 289,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 6,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 319,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "config": "all",
+   "depth": 7,
+   "move": "a1a2",
+   "score": 95,
+   "nodes": 369,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 54,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 423,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 3013,
+   "timeMs": 27,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 23681,
+   "timeMs": 67,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 154510,
+   "timeMs": 244,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "minimax",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 1179873,
+   "timeMs": 1799,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 37,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 209,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 878,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 5068,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 17520,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 89364,
+   "timeMs": 162,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 36,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 206,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 810,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 4420,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 14757,
+   "timeMs": 44,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 75640,
+   "timeMs": 162,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 37,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 209,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 749,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 2609,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 5951,
+   "timeMs": 21,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 11214,
+   "timeMs": 31,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 36,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 206,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 719,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 2174,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 5299,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 9123,
+   "timeMs": 24,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 9,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 36,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 206,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 719,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 2174,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 5299,
+   "timeMs": 15,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 9123,
+   "timeMs": 29,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 17,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 63,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 439,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 1205,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 4679,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 7986,
+   "timeMs": 22,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "c4d4",
+   "score": 125,
+   "nodes": 15627,
+   "timeMs": 46,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 1,
+   "move": "c4b3",
+   "score": 80,
+   "nodes": 17,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 2,
+   "move": "c4b3",
+   "score": 60,
+   "nodes": 63,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 3,
+   "move": "c4d3",
+   "score": 130,
+   "nodes": 439,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 4,
+   "move": "c4d3",
+   "score": 120,
+   "nodes": 1205,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 5,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 4679,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 6,
+   "move": "c4d3",
+   "score": 125,
+   "nodes": 7986,
+   "timeMs": 19,
+   "aborted": false
+  },
+  {
+   "position": "King and pawn",
+   "config": "all",
+   "depth": 7,
+   "move": "c4d4",
+   "score": 125,
+   "nodes": 15627,
+   "timeMs": 30,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 225,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 4409,
+   "timeMs": 56,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 60014,
+   "timeMs": 133,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 1271035,
+   "timeMs": 2092,
+   "aborted": false
+  },
+  {
+   "position": "Perft position 6",
+   "config": "all",
+   "depth": 7,
+   "move": "g5f6",
+   "score": -23,
+   "nodes": 2484224,
+   "timeMs": 30005,
+   "aborted": true
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 11750963,
+   "timeMs": 21647,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 248,
+   "nodes": 6168046,
+   "timeMs": 22567,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 79,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 806,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 2656,
+   "timeMs": 18,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 20214,
+   "timeMs": 79,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "g4e6",
+   "score": 132,
+   "nodes": 62059,
+   "timeMs": 421,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 248,
+   "nodes": 384149,
+   "timeMs": 1616,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "d7c5",
+   "score": 194,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 79,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "d7f6",
+   "score": 211,
+   "nodes": 806,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 138,
+   "nodes": 2656,
+   "timeMs": 18,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "g4e6",
+   "score": 274,
+   "nodes": 15286,
+   "timeMs": 63,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "g4e6",
+   "score": 132,
+   "nodes": 57416,
+   "timeMs": 375,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 238,
+   "nodes": 234037,
+   "timeMs": 1167,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 75,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 205,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "g4e6",
+   "score": 163,
+   "nodes": 2062,
+   "timeMs": 19,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 178,
+   "nodes": 9066,
+   "timeMs": 109,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "g4h3",
+   "score": 178,
+   "nodes": 46555,
+   "timeMs": 208,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "g4h3",
+   "score": 182,
+   "nodes": 160677,
+   "timeMs": 1390,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 192,
+   "nodes": 845260,
+   "timeMs": 3266,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 1,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 75,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 2,
+   "move": "d7f6",
+   "score": 89,
+   "nodes": 205,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 3,
+   "move": "g4e6",
+   "score": 163,
+   "nodes": 2062,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 4,
+   "move": "g4e6",
+   "score": 178,
+   "nodes": 9066,
+   "timeMs": 79,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 5,
+   "move": "g4h3",
+   "score": 178,
+   "nodes": 40732,
+   "timeMs": 162,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 6,
+   "move": "g4h3",
+   "score": 182,
+   "nodes": 147258,
+   "timeMs": 1225,
+   "aborted": false
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "config": "all",
+   "depth": 7,
+   "move": "g4h3",
+   "score": 188,
+   "nodes": 520573,
+   "timeMs": 2184,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "minimax",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 16826368,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 69,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 925,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 4258,
+   "timeMs": 17,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 49261,
+   "timeMs": 107,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 184980,
+   "timeMs": 884,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "minimax",
+   "depth": 7,
+   "move": "a5a6",
+   "score": -10,
+   "nodes": 17619968,
+   "timeMs": 30000,
+   "aborted": true
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 102,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 875,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 6262,
+   "timeMs": 25,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 53114,
+   "timeMs": 130,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 297535,
+   "timeMs": 947,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 2028868,
+   "timeMs": 4477,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 33,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 303,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 598,
+   "timeMs": 5,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 5647,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 9593,
+   "timeMs": 67,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 98870,
+   "timeMs": 215,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 69,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 925,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 3744,
+   "timeMs": 15,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 32154,
+   "timeMs": 77,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 83497,
+   "timeMs": 304,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 471599,
+   "timeMs": 1065,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 33,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 303,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 548,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 4259,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 5292,
+   "timeMs": 27,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 31951,
+   "timeMs": 71,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 16,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 33,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 303,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 548,
+   "timeMs": 4,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 2543,
+   "timeMs": 6,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 2890,
+   "timeMs": 14,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 17458,
+   "timeMs": 44,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 31,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 53,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 579,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 861,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 8134,
+   "timeMs": 13,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 7458,
+   "timeMs": 63,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 58698,
+   "timeMs": 75,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 1,
+   "move": "c1e3",
+   "score": 945,
+   "nodes": 31,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 2,
+   "move": "c1e3",
+   "score": 925,
+   "nodes": 53,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 3,
+   "move": "c1e3",
+   "score": 935,
+   "nodes": 579,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 4,
+   "move": "c1e3",
+   "score": 915,
+   "nodes": 861,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 5,
+   "move": "c1e3",
+   "score": 930,
+   "nodes": 4966,
+   "timeMs": 7,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 6,
+   "move": "c1e3",
+   "score": 920,
+   "nodes": 5436,
+   "timeMs": 41,
+   "aborted": false
+  },
+  {
+   "position": "Queen vs rook",
+   "config": "all",
+   "depth": 7,
+   "move": "c1e3",
+   "score": 940,
+   "nodes": 32675,
+   "timeMs": 37,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 120,
+   "nodes": 2204421,
+   "timeMs": 5861,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 30,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 424,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 2036,
+   "timeMs": 12,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 12391,
+   "timeMs": 35,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 22666,
+   "timeMs": 123,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 120,
+   "nodes": 160439,
+   "timeMs": 462,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 102,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 875,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 5738,
+   "timeMs": 20,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 40108,
+   "timeMs": 109,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 173989,
+   "timeMs": 570,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+tt",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 120,
+   "nodes": 983654,
+   "timeMs": 2749,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 30,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 424,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 1833,
+   "timeMs": 10,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 9885,
+   "timeMs": 29,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 16772,
+   "timeMs": 93,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 120,
+   "nodes": 84576,
+   "timeMs": 321,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 15,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 30,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 70,
+   "nodes": 424,
+   "timeMs": 1,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 4,
+   "move": "b4c4",
+   "score": -20,
+   "nodes": 1833,
+   "timeMs": 11,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 90,
+   "nodes": 2034,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 0,
+   "nodes": 12594,
+   "timeMs": 73,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+null",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 120,
+   "nodes": 23976,
+   "timeMs": 91,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 305,
+   "timeMs": 3,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 1160,
+   "timeMs": 8,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 4,
+   "move": "b4f4",
+   "score": 25,
+   "nodes": 3853,
+   "timeMs": 27,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 25,
+   "nodes": 20764,
+   "timeMs": 70,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 35,
+   "nodes": 43577,
+   "timeMs": 290,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "ab+ord+tt+q",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 35,
+   "nodes": 252101,
+   "timeMs": 915,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 1,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 29,
+   "timeMs": 0,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 2,
+   "move": "b4f4",
+   "score": 10,
+   "nodes": 305,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 3,
+   "move": "b4f4",
+   "score": 30,
+   "nodes": 1160,
+   "timeMs": 2,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 4,
+   "move": "b4f4",
+   "score": 25,
+   "nodes": 3853,
+   "timeMs": 26,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 5,
+   "move": "b4f4",
+   "score": 25,
+   "nodes": 17629,
+   "timeMs": 64,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 6,
+   "move": "b4f4",
+   "score": 35,
+   "nodes": 24417,
+   "timeMs": 145,
+   "aborted": false
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "config": "all",
+   "depth": 7,
+   "move": "b4f4",
+   "score": 35,
+   "nodes": 106271,
+   "timeMs": 421,
+   "aborted": false
+  }
+ ]
+}

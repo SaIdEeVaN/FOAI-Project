@@ -36,8 +36,9 @@ const EVAL_TERMS = [
 
 const QUEUED = { status: 'queued', nodes: 0, timeMs: 0 };
 
-// Sharp positions to load in one click. The sparse ones let plain minimax finish
-// at depth 5; Kiwipete shows what a busy position does to it.
+// Sharp positions to load in one click. Plain minimax finishes the rook endgame
+// at depth 5; on the middlegames it runs into the time bound and reports a lower
+// bound, which is itself the lesson.
 const PRESETS = [
   { label: 'Opera mate', fen: '4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16',
     note: 'Morphy, Paris 1858: 16.Qb8+! Nxb8 17.Rd8# — mate in two' },

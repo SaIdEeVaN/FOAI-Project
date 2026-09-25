@@ -34,16 +34,22 @@ console.log(table(['Configuration', ...depths.map(d => `d${d}`)],
     return ratios.length ? `${geomean(ratios).toFixed(1)}× (${ratios.length})` : '';
   })])));
 
-// 3. Effective branching factor: nodes(d) / nodes(d−1), geometric mean.
-console.log(`\n### Effective branching factor, nodes(d) / nodes(d−1) (geometric mean over positions)\n`);
-console.log(table(['Configuration', ...depths.slice(1).map(d => `d${d - 1}→d${d}`)],
-  configs.map(c => [c.label, ...depths.slice(1).map(d => {
-    const ratios = positions.map(p => {
-      const a = get(p.name, c.id, d - 1), b = get(p.name, c.id, d);
-      return a && b && !a.aborted && !b.aborted ? b.nodes / a.nodes : null;
-    }).filter(Boolean);
-    return ratios.length ? geomean(ratios).toFixed(2) : '';
-  })])));
+// 3. Effective branching factor: nodes(d) / nodes(d−1), geometric mean. Each
+// column uses only the positions every listed configuration finished at both
+// depths, so a column compares the configurations on the same positions.
+console.log(`\n### Effective branching factor, nodes(d) / nodes(d−1) (geometric mean; same positions down each column)\n`);
+const finished = (p, c, d) => { const r = get(p.name, c.id, d); return r && !r.aborted; };
+const ebfColumn = (list, d) => {
+  const common = positions.filter(p => list.every(c => finished(p, c, d - 1) && finished(p, c, d)));
+  return { common, value: (c) => common.length
+    ? geomean(common.map(p => get(p.name, c.id, d).nodes / get(p.name, c.id, d - 1).nodes)).toFixed(2) : '' };
+};
+const pruned = configs.slice(1);
+const cols = depths.slice(1).map(d => ({ d, all: ebfColumn(configs, d), pruned: ebfColumn(pruned, d) }));
+console.log(table(['Configuration', ...cols.map(({ d, all, pruned: p }) =>
+  `d${d - 1}→d${d} (${all.common.length} / ${p.common.length})`)],
+  configs.map((c, i) => [c.label, ...cols.map(col => (i === 0 ? col.all.value(c) : col.pruned.value(c)))])));
+console.log('\nColumn counts: positions behind the plain-minimax row / behind the other rows.');
 
 // 4. Agreement with plain minimax at the same depth.
 console.log(`\n### Same answer as plain minimax? (positions × depths where minimax finished)\n`);
