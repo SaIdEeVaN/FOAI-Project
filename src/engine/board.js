@@ -1,5 +1,5 @@
 // ── Board representation ──────────────────────────────────────────────────
-const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+export const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 // A move from or to a rook's home corner removes that castling right.
 const ROOK_CORNERS = { 63: 'K', 56: 'Q', 7: 'k', 0: 'q' };
 
@@ -42,6 +42,24 @@ export class Board {
   }
 
   reset() { this.parseFen(START_FEN); }
+
+  toFen() {
+    const ranks = [];
+    for (let r = 0; r < 8; r++) {
+      let row = '', empty = 0;
+      for (let f = 0; f < 8; f++) {
+        const p = this.squares[r * 8 + f];
+        if (p === '.') { empty++; continue; }
+        if (empty) { row += empty; empty = 0; }
+        row += p;
+      }
+      ranks.push(empty ? row + empty : row);
+    }
+    const rights = ['K', 'Q', 'k', 'q'].filter(c => this.castlingRights[c]).join('') || '-';
+    const ep = this.enPassant === null ? '-'
+      : `${String.fromCharCode(97 + (this.enPassant % 8))}${8 - Math.floor(this.enPassant / 8)}`;
+    return `${ranks.join('/')} ${this.sideToMove} ${rights} ${ep} ${this.halfMoveClock} ${this.fullMoveNumber}`;
+  }
 
   serialize() {
     return {
