@@ -78,6 +78,7 @@ external GUIs.
 | P12 | Move history lists the game in UCI, newest move highlighted and scrolled into view | Done |
 | P13 | Engine console reports best move, depth, nodes and score, plus a line per deepening iteration | Done |
 | P14 | The engine heads for a repetition when it is losing and steers clear of one when it is winning | Done |
+| P16 | Time controls as on chess.com / lichess: Bullet 1+0 and 2+1, Blitz 3+0, 3+2 and 5+0, Rapid 10+0 (default) and 15+10, or no clock. Both clocks start once each side has made its first move; the mover then earns the increment. The engine thinks for about 1/30 of its remaining time plus most of the increment, capped at 2s. A flag loses on time, or draws if the opponent has only a king. Undo is off and the time control is locked while a timed game is in progress. The last choice is remembered | Done |
 | P15 | Premoves: while the engine thinks the player may queue one move, highlighted on the board. It is played the moment the engine replies if still legal (a promotion becomes a queen), otherwise dropped. Any click or a right-click cancels it | Done |
 
 ## 6. Functional requirements — Teaching mode

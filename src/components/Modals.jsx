@@ -42,6 +42,7 @@ export function GameOverModal({ gameEnd, onPlayAgain }) {
         <p className="modal-sub">
           {gameEnd.type === 'checkmate' ? 'by checkmate'
             : gameEnd.type === 'resign' ? 'by resignation'
+            : gameEnd.type === 'timeout' ? 'on time'
             : `by ${gameEnd.reason.toLowerCase()}`}
         </p>
         <button className="btn btn-primary" onClick={onPlayAgain}>Play again</button>

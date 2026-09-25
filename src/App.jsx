@@ -12,6 +12,7 @@ import TeachingMode from './components/TeachingMode.jsx';
 import { GameOverModal, PromotionModal } from './components/Modals.jsx';
 import { Piece, pieceName } from './components/PieceSymbols.jsx';
 import { formatScore, isMate, mateIn, MATE_SCORE } from './components/score.js';
+import { Clock, TimeControlPicker, findTimeControl, isTimed } from './components/TimeControl.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -20,6 +21,24 @@ const evaluator = new Evaluation();
 // Instant, search-free read of a position, from White's side. It moves the bar the
 // moment a piece lands; the engine's deeper scores then refine it as they arrive.
 const staticEval = (board) => evaluator.evaluate(board);
+
+const other = (c) => (c === 'w' ? 'b' : 'w');
+const colorName = (c) => (c === 'w' ? 'White' : 'Black');
+
+// The last time control picked is remembered per browser; storage may be unavailable.
+const TC_KEY = 'foai-time-control';
+function loadTimeControl() {
+  try { return findTimeControl(localStorage.getItem(TC_KEY)); } catch { return findTimeControl(null); }
+}
+function saveTimeControl(tc) {
+  try { localStorage.setItem(TC_KEY, tc.id); } catch { /* not persisted */ }
+}
+
+// How long the engine may think on a clock: a slice of what is left plus most of
+// the increment, never more than the untimed 2s and never so little it cannot move.
+function engineBudget(remainingMs, incMs) {
+  return Math.round(Math.max(50, Math.min(2000, remainingMs / 30 + incMs * 0.8)));
+}
 
 // Each game hands the player a random side.
 const randomColor = () => (Math.random() < 0.5 ? 'w' : 'b');
@@ -91,7 +110,7 @@ function EvalBar({ score, flip }) {
 }
 
 // ── Player seat ─────────────────────────────────────────────────────────────
-function Seat({ name, color, squares, badge }) {
+function Seat({ name, color, squares, badge, clock }) {
   // A side's advantage is what it took from the other side, minus what it gave up.
   const mine  = captured(squares, color === 'w' ? 'b' : 'w');
   const yours = captured(squares, color);
@@ -107,7 +126,10 @@ function Seat({ name, color, squares, badge }) {
           {edge > 0 && <span className="seat-edge">+{edge}</span>}
         </span>
       )}
-      {badge}
+      <span className="seat-end">
+        {badge}
+        {clock}
+      </span>
     </div>
   );
 }
@@ -134,6 +156,12 @@ export default function App() {
   const [premove, setPremoveState] = useState(null);
   const premoveRef = useRef(null);
   const setPremove = (pm) => { premoveRef.current = pm; setPremoveState(pm); };
+  const [timeControl, setTimeControl] = useState(loadTimeControl);
+  const timeControlRef = useRef(timeControl);
+  // The clocks live in a ref ({ w, b, running, since }) so the engine's stale reply
+  // handler can charge them; clockView is what the seats show, refreshed on a timer.
+  const clockRef = useRef(undefined);
+  const [clockView, setClockView] = useState(() => isTimed(timeControl) ? { w: timeControl.base, b: timeControl.base } : null);
   const workerRef = useRef(null);
   // Id of the search whose messages still count. Resigning or starting a new game
   // bumps it, so a search already running in the worker is ignored when it lands.
@@ -182,6 +210,84 @@ export default function App() {
     setSquares([...boardRef.current.squares]);
     setSideToMove(boardRef.current.sideToMove);
   }, []);
+
+  // ── Clocks ────────────────────────────────────────────────────────────────
+  const resetClock = (tc) => {
+    timeControlRef.current = tc;
+    clockRef.current = isTimed(tc) ? { w: tc.base, b: tc.base, running: null, since: 0 } : null;
+    setClockView(clockRef.current && { w: tc.base, b: tc.base });
+  };
+  if (clockRef.current === undefined) {
+    clockRef.current = isTimed(timeControl) ? { w: timeControl.base, b: timeControl.base, running: null, since: 0 } : null;
+  }
+
+  // Time left on both clocks right now, without charging anyone.
+  const readClock = () => {
+    const c = clockRef.current;
+    if (!c) return null;
+    const spent = c.running ? performance.now() - c.since : 0;
+    return { w: c.w - (c.running === 'w' ? spent : 0), b: c.b - (c.running === 'b' ? spent : 0) };
+  };
+
+  // Book the time used so far against whoever is running and stop the clocks.
+  const stopClock = () => {
+    const c = clockRef.current;
+    if (!c) return;
+    Object.assign(c, readClock(), { running: null });
+    setClockView(readClock());
+  };
+
+  const outOfTime = (color) => {
+    const now = readClock();
+    return !!now && clockRef.current.running === color && now[color] <= 0;
+  };
+
+  // A move by `color` just landed. As on lichess, the clocks start once both
+  // sides have made their first move; from then on the mover earns the increment.
+  const pressClock = (color) => {
+    const c = clockRef.current;
+    if (!c) return;
+    const wasRunning = c.running === color;
+    stopClock();
+    if (wasRunning) c[color] += timeControlRef.current.inc;
+    const movesPlayed = positionsRef.current.length - 1;
+    if (movesPlayed >= 2) { c.running = other(color); c.since = performance.now(); }
+    setClockView(readClock());
+  };
+
+  // `color` ran out of time. Without mating material the other side cannot win on time.
+  const flag = (color) => {
+    searchIdRef.current++; // Drop the engine's search if it was the one thinking
+    clockRef.current[color] = 0;
+    clockRef.current.running = null;
+    setClockView(readClock());
+    setEngineThinking(false);
+    setPremove(null);
+    setSelectedSq(null);
+    setLegalTargets([]);
+    setPendingPromotion(null);
+    const winner = other(color);
+    const winnerPieces = boardRef.current.squares.filter(p => p !== '.' && (winner === 'w' ? p < 'a' : p >= 'a'));
+    setGameEnd(winnerPieces.length === 1
+      ? { type: 'draw', reason: 'Timeout vs Insufficient Material' }
+      : { type: 'timeout', winner: colorName(winner) });
+  };
+
+  // Tick the display and watch for a flag while a clock runs.
+  useEffect(() => {
+    if (gameEnd || !isTimed(timeControl)) return;
+    const id = setInterval(() => {
+      const c = clockRef.current;
+      if (!c?.running) return;
+      const now = readClock();
+      setClockView(now);
+      if (now[c.running] <= 0) flag(c.running);
+    }, 100);
+    return () => clearInterval(id);
+  }, [gameEnd, timeControl]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // However the game ends, the clocks stop.
+  useEffect(() => { if (gameEnd) stopClock(); }, [gameEnd]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Square click ──────────────────────────────────────────────────────────
   const onSquareClick = useCallback((sq) => {
@@ -265,8 +371,11 @@ export default function App() {
   };
 
   const _executeMove = (move) => {
+    const mover = boardRef.current.sideToMove;
+    if (outOfTime(mover)) { flag(mover); return; }
     boardRef.current.makeMove(move);
     positionsRef.current.push(boardRef.current.positionKey());
+    pressClock(mover);
     setSelectedSq(null);
     setLegalTargets([]);
     setLastMove({ from: move.startSq, to: move.targetSq });
@@ -287,7 +396,9 @@ export default function App() {
       payload: {
         id,
         boardState: boardRef.current.serialize(),
-        timeLimitMs: 2000,
+        timeLimitMs: clockRef.current
+          ? engineBudget(readClock()[other(playerColorRef.current)], timeControlRef.current.inc)
+          : 2000,
         positionHistory: positionsRef.current,
       },
     });
@@ -311,8 +422,11 @@ export default function App() {
     const move  = legal.find(m => m.toUci() === payload.uci);
     if (!move) return;
 
+    const mover = boardRef.current.sideToMove;
+    if (outOfTime(mover)) { flag(mover); return; }
     boardRef.current.makeMove(move);
     positionsRef.current.push(boardRef.current.positionKey());
+    pressClock(mover);
     setLastMove({ from, to });
     setMoveHistory(prev => [...prev, payload.uci]);
     // The search scores from the mover's point of view; the bar reads from White's.
@@ -350,8 +464,9 @@ export default function App() {
   };
 
   // A fresh game, on a random side unless one is asked for.
-  const startGame = (color = randomColor()) => {
+  const startGame = (color = randomColor(), tc = timeControlRef.current) => {
     searchIdRef.current++;
+    resetClock(tc);
     setPremove(null);
     setConfirmResign(false);
     setPlayerColor(color);
@@ -371,6 +486,12 @@ export default function App() {
   };
 
   const newGame = () => startGame();
+
+  const changeTimeControl = (tc) => {
+    setTimeControl(tc);
+    saveTimeControl(tc);
+    startGame(randomColor(), tc);
+  };
 
   const resign = () => {
     if (gameEnd) return;
@@ -396,7 +517,7 @@ export default function App() {
     // Take back the player's last move and the engine's reply to it, if any, so it
     // is the player's turn again. Playing Black, the engine's opening move stays.
     const keep = lastPlayerMoveIndex(moveHistory.length, playerColor);
-    if (engineThinking || keep < 0) return;
+    if (isTimed(timeControl) || engineThinking || keep < 0) return;
     // Simplest approach: reset and replay
     const replayMoves = moveHistory.slice(0, keep);
     boardRef.current.reset();
@@ -424,6 +545,7 @@ export default function App() {
   if (gameEnd) {
     statusText = gameEnd.type === 'checkmate' ? `Checkmate — ${gameEnd.winner} wins`
       : gameEnd.type === 'resign' ? `You resigned — ${gameEnd.winner} wins`
+      : gameEnd.type === 'timeout' ? `${gameEnd.winner} wins on time`
       : `Draw — ${gameEnd.reason}`;
   } else if (engineThinking || sideToMove !== playerColor) {
     statusText = premove ? 'Premove set' : 'Engine thinking…';
@@ -435,6 +557,11 @@ export default function App() {
   const kingSq  = inCheck ? boardRef.current.squares.findIndex(p => p === (sideToMove === 'w' ? 'K' : 'k')) : -1;
   const engineColor = playerColor === 'w' ? 'b' : 'w';
   const flip = playerColor === 'b';
+  const timed = isTimed(timeControl);
+  const gameInProgress = !gameEnd && lastPlayerMoveIndex(moveHistory.length, playerColor) >= 0;
+  const clockFor = (color) => clockView && (
+    <Clock ms={clockView[color]} active={!gameEnd && clockRef.current?.running === color} />
+  );
 
   return (
     <div className="app">
@@ -482,6 +609,7 @@ export default function App() {
             color={engineColor}
             squares={squares}
             badge={engineThinking ? <span className="badge searching">thinking…</span> : null}
+            clock={clockFor(engineColor)}
           />
 
           <div className="board-stage">
@@ -508,12 +636,14 @@ export default function App() {
                 {statusText}
               </span>
             }
+            clock={clockFor(playerColor)}
           />
 
           <div className="controls">
             <button className="btn btn-ghost" onClick={newGame}>New game</button>
             <button className="btn btn-ghost" onClick={undoMove}
-              disabled={engineThinking || lastPlayerMoveIndex(moveHistory.length, playerColor) < 0}>Undo</button>
+              disabled={timed || engineThinking || lastPlayerMoveIndex(moveHistory.length, playerColor) < 0}
+              title={timed ? 'No takebacks in a timed game' : undefined}>Undo</button>
             <button
               className={`btn ${confirmResign ? 'btn-danger' : 'btn-ghost'}`}
               onClick={resign}
@@ -524,7 +654,7 @@ export default function App() {
             <button
               className="btn btn-primary"
               onClick={() => startGame(engineColor)}
-              disabled={!gameEnd && lastPlayerMoveIndex(moveHistory.length, playerColor) >= 0}
+              disabled={gameInProgress}
               title="Start a new game on the other side"
             >
               Play as {playerColor === 'w' ? 'Black' : 'White'}
@@ -534,6 +664,7 @@ export default function App() {
 
         {/* Right — info */}
         <section className="info-section">
+          <TimeControlPicker value={timeControl} onChange={changeTimeControl} disabled={gameInProgress} />
           <MoveHistory moves={moveHistory} />
           <EngineConsole
             telemetry={telemetry}
