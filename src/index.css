@@ -940,10 +940,24 @@ html, body, #root {
   transition: background 0.15s, border-color 0.15s, opacity 0.15s;
 }
 .tc-btn:hover:not(:disabled) { background: var(--border); }
-.tc-btn[aria-pressed="true"] {
+.tc-btn[aria-checked="true"] {
   background: var(--accent-soft);
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 600;
 }
-.tc-btn:disabled { opacity: 0.45; cursor: default; }
+.tc-summary { margin-bottom: 0; }
+.tc-current {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* New-game dialog */
+.modal.setup { text-align: left; align-items: stretch; gap: 14px; width: min(420px, 100%); padding: 28px 30px; }
+.setup-section { display: flex; flex-direction: column; gap: 10px; }
+.setup-sides { display: flex; gap: 6px; }
+.setup-sides .tc-btn { flex: 1; font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; }
+.setup-sides .pc { width: 18px; height: 18px; }
+.setup-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }

@@ -14,8 +14,8 @@ The AI opponent runs entirely in the browser using a custom chess engine with:
 
 | Feature | Details |
 |---|---|
-| Play vs AI | Each game puts you on a random side; *Play as White/Black* restarts on the other side until you have moved |
-| Time controls | Bullet (1+0, 2+1), Blitz (3+0, 3+2, 5+0), Rapid (10+0, 15+10) or no clock. Clocks start once both sides have moved, the engine budgets its thinking time from its clock, and running out loses on time. No takebacks in timed games |
+| Play vs AI | Every match opens with a *New game* dialog: pick the time control and your side (White, Black or Random) before the first move |
+| Time controls | Bullet (1+0, 2+1), Blitz (3+0, 3+2, 5+0), Rapid (10+0, 15+10) or no clock, fixed for the whole match. Clocks start once both sides have moved, the engine budgets its thinking time from its clock, and running out loses on time. No takebacks in timed games |
 | Premoves | Queue a move while the engine thinks; it plays the instant the engine replies, if still legal. Click or right-click to cancel |
 | Legal move hints | Click a piece to see valid squares |
 | Last-move highlight | The previous move is highlighted on the board |

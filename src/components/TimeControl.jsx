@@ -37,34 +37,43 @@ export function Clock({ ms, active }) {
 
 const CATEGORIES = [...new Set(TIME_CONTROLS.map(tc => tc.category))];
 
-export function TimeControlPicker({ value, onChange, disabled }) {
+export const describeTimeControl = (tc) => (isTimed(tc) ? `${tc.category} · ${tc.id}` : 'Casual · no clock');
+
+// The grid of choices, shown only in the new-game dialog: a match keeps the
+// time control it started with.
+export function TimeControlOptions({ value, onChange }) {
+  return (
+    <div className="tc-grid" role="radiogroup" aria-label="Time control">
+      {CATEGORIES.map(cat => (
+        <div key={cat} className="tc-row">
+          <span className="tc-cat">{cat}</span>
+          <div className="tc-options">
+            {TIME_CONTROLS.filter(tc => tc.category === cat).map(tc => (
+              <button
+                key={tc.id}
+                type="button"
+                role="radio"
+                className="tc-btn"
+                aria-checked={value.id === tc.id}
+                onClick={() => onChange(tc)}
+              >
+                {tc.label || tc.id}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Read-only reminder beside the board of what this match is being played at.
+export function TimeControlSummary({ value }) {
   return (
     <section className="panel tc-panel" aria-labelledby="tc-label">
-      <div className="panel-head">
+      <div className="panel-head tc-summary">
         <h2 id="tc-label" className="panel-label">Time control</h2>
-        {disabled && <span className="panel-meta">locked mid-game</span>}
-      </div>
-      <div className="tc-grid">
-        {CATEGORIES.map(cat => (
-          <div key={cat} className="tc-row">
-            <span className="tc-cat">{cat}</span>
-            <div className="tc-options">
-              {TIME_CONTROLS.filter(tc => tc.category === cat).map(tc => (
-                <button
-                  key={tc.id}
-                  type="button"
-                  className="tc-btn"
-                  aria-pressed={value.id === tc.id}
-                  disabled={disabled}
-                  title={disabled ? 'Finish or resign this game to change the time control' : undefined}
-                  onClick={() => onChange(tc)}
-                >
-                  {tc.label || tc.id}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        <span className="tc-current">{describeTimeControl(value)}</span>
       </div>
     </section>
   );

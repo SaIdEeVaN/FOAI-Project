@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Piece, pieceName } from './PieceSymbols.jsx';
+import { TimeControlOptions } from './TimeControl.jsx';
 
 const CARD_IN  = { scale: 0.75, opacity: 0, y: 30 };
 const CARD_MID = { scale: 1, opacity: 1, y: 0 };
@@ -94,6 +96,69 @@ export function PromotionModal({ color, onPick, onCancel }) {
           })}
         </div>
         <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+const SIDES = [
+  { id: 'random', label: 'Random', piece: null },
+  { id: 'w', label: 'White', piece: 'K' },
+  { id: 'b', label: 'Black', piece: 'k' },
+];
+
+// Shown before every match: the time control is fixed here and cannot change once
+// the game is under way. `onCancel` is absent when there is no game to go back to.
+export function NewGameModal({ timeControl, side, onStart, onCancel }) {
+  const [tc, setTc] = useState(timeControl);
+  const [pick, setPick] = useState(side);
+
+  return (
+    <motion.div
+      className="overlay"
+      onClick={onCancel}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="modal setup"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="setup-title"
+        onClick={e => e.stopPropagation()}
+        initial={CARD_IN}
+        animate={CARD_MID}
+        exit={CARD_OUT}
+        transition={SPRING}
+      >
+        <div>
+          <p className="modal-eyebrow">New game</p>
+          <h2 id="setup-title" className="modal-title">Choose a time control</h2>
+        </div>
+
+        <section className="setup-section">
+          <TimeControlOptions value={tc} onChange={setTc} />
+        </section>
+
+        <section className="setup-section">
+          <p className="modal-eyebrow">Play as</p>
+          <div className="setup-sides" role="radiogroup" aria-label="Play as">
+            {SIDES.map(s => (
+              <button key={s.id} type="button" role="radio" className="tc-btn"
+                aria-checked={pick === s.id} onClick={() => setPick(s.id)}>
+                {s.piece && <Piece piece={s.piece} />}
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <div className="setup-actions">
+          {onCancel && <button className="btn btn-ghost" onClick={onCancel}>Back to game</button>}
+          <button className="btn btn-primary" onClick={() => onStart(tc, pick)} autoFocus>Start game</button>
+        </div>
       </motion.div>
     </motion.div>
   );

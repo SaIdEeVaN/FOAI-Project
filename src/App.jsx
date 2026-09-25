@@ -9,10 +9,10 @@ import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
 import TeachingMode from './components/TeachingMode.jsx';
-import { GameOverModal, PromotionModal } from './components/Modals.jsx';
+import { GameOverModal, NewGameModal, PromotionModal } from './components/Modals.jsx';
 import { Piece, pieceName } from './components/PieceSymbols.jsx';
 import { formatScore, isMate, mateIn, MATE_SCORE } from './components/score.js';
-import { Clock, TimeControlPicker, findTimeControl, isTimed } from './components/TimeControl.jsx';
+import { Clock, TimeControlSummary, findTimeControl, isTimed } from './components/TimeControl.jsx';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -157,6 +157,11 @@ export default function App() {
   const premoveRef = useRef(null);
   const setPremove = (pm) => { premoveRef.current = pm; setPremoveState(pm); };
   const [timeControl, setTimeControl] = useState(loadTimeControl);
+  // Every match opens with the new-game dialog; nothing moves until it is started,
+  // and its time control holds until the match is over.
+  const [setupOpen, setSetupOpen] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [sidePick, setSidePick] = useState('random'); // 'random' | 'w' | 'b'
   const timeControlRef = useRef(timeControl);
   // The clocks live in a ref ({ w, b, running, since }) so the engine's stale reply
   // handler can charge them; clockView is what the seats show, refreshed on a timer.
@@ -291,7 +296,7 @@ export default function App() {
 
   // ── Square click ──────────────────────────────────────────────────────────
   const onSquareClick = useCallback((sq) => {
-    if (gameEnd) return;
+    if (gameEnd || !gameStarted) return;
     const piece = boardRef.current.squares[sq];
     const isOwnPiece = piece !== '.' && (playerColor === 'w' ? piece === piece.toUpperCase() : piece === piece.toLowerCase());
 
@@ -340,7 +345,7 @@ export default function App() {
     // Deselect
     setSelectedSq(null);
     setLegalTargets([]);
-  }, [selectedSq, legalTargets, gameEnd, engineThinking, playerColor]);
+  }, [selectedSq, legalTargets, gameEnd, engineThinking, playerColor, gameStarted]);
 
   const commitPlayerMove = (from, to) => {
     const gen = new MoveGenerator(boardRef.current);
@@ -406,10 +411,10 @@ export default function App() {
 
   // Auto-trigger engine if it's its turn
   useEffect(() => {
-    if (!gameEnd && !engineThinking && sideToMove !== playerColor) {
+    if (gameStarted && !gameEnd && !engineThinking && sideToMove !== playerColor) {
       requestEngine();
     }
-  }, [sideToMove, playerColor, gameEnd, engineThinking, requestEngine]);
+  }, [gameStarted, sideToMove, playerColor, gameEnd, engineThinking, requestEngine]);
 
   const applyEngineResult = (payload) => {
     setEngineThinking(false);
@@ -485,12 +490,16 @@ export default function App() {
     setEngineThinking(false);
   };
 
-  const newGame = () => startGame();
+  const newGame = () => setSetupOpen(true);
 
-  const changeTimeControl = (tc) => {
+  // Start button of the new-game dialog.
+  const beginGame = (tc, pick) => {
     setTimeControl(tc);
     saveTimeControl(tc);
-    startGame(randomColor(), tc);
+    setSidePick(pick);
+    startGame(pick === 'random' ? randomColor() : pick, tc);
+    setGameStarted(true);
+    setSetupOpen(false);
   };
 
   const resign = () => {
@@ -542,7 +551,9 @@ export default function App() {
 
   // ── Status text ───────────────────────────────────────────────────────────
   let statusText;
-  if (gameEnd) {
+  if (!gameStarted) {
+    statusText = 'Pick a time control';
+  } else if (gameEnd) {
     statusText = gameEnd.type === 'checkmate' ? `Checkmate — ${gameEnd.winner} wins`
       : gameEnd.type === 'resign' ? `You resigned — ${gameEnd.winner} wins`
       : gameEnd.type === 'timeout' ? `${gameEnd.winner} wins on time`
@@ -558,7 +569,6 @@ export default function App() {
   const engineColor = playerColor === 'w' ? 'b' : 'w';
   const flip = playerColor === 'b';
   const timed = isTimed(timeControl);
-  const gameInProgress = !gameEnd && lastPlayerMoveIndex(moveHistory.length, playerColor) >= 0;
   const clockFor = (color) => clockView && (
     <Clock ms={clockView[color]} active={!gameEnd && clockRef.current?.running === color} />
   );
@@ -640,31 +650,23 @@ export default function App() {
           />
 
           <div className="controls">
-            <button className="btn btn-ghost" onClick={newGame}>New game</button>
+            <button className="btn btn-primary" onClick={newGame}>New game</button>
             <button className="btn btn-ghost" onClick={undoMove}
               disabled={timed || engineThinking || lastPlayerMoveIndex(moveHistory.length, playerColor) < 0}
               title={timed ? 'No takebacks in a timed game' : undefined}>Undo</button>
             <button
               className={`btn ${confirmResign ? 'btn-danger' : 'btn-ghost'}`}
               onClick={resign}
-              disabled={!!gameEnd}
+              disabled={!gameStarted || !!gameEnd}
             >
               {confirmResign ? 'Confirm resign?' : 'Resign'}
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={() => startGame(engineColor)}
-              disabled={gameInProgress}
-              title="Start a new game on the other side"
-            >
-              Play as {playerColor === 'w' ? 'Black' : 'White'}
             </button>
           </div>
         </section>
 
         {/* Right — info */}
         <section className="info-section">
-          <TimeControlPicker value={timeControl} onChange={changeTimeControl} disabled={gameInProgress} />
+          <TimeControlSummary value={timeControl} />
           <MoveHistory moves={moveHistory} />
           <EngineConsole
             telemetry={telemetry}
@@ -677,8 +679,19 @@ export default function App() {
       )}
 
       <AnimatePresence>
-        {gameEnd && view === 'play' && (
+        {gameEnd && view === 'play' && !setupOpen && (
           <GameOverModal gameEnd={gameEnd} onPlayAgain={newGame} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {setupOpen && view === 'play' && (
+          <NewGameModal
+            timeControl={timeControl}
+            side={sidePick}
+            onStart={beginGame}
+            onCancel={gameStarted ? () => setSetupOpen(false) : undefined}
+          />
         )}
       </AnimatePresence>
 
