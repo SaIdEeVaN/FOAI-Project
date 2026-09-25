@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test test/*.test.js",
+    "test:deep": "PERFT_DEEP=1 node --test test/*.test.js",
+    "bench:match": "node bench/match.js",
+    "bench:experiments": "node bench/experiments.js"
   },
   "devDependencies": {
     "typescript": "~6.0.2",
