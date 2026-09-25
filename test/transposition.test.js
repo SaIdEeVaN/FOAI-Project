@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { TranspositionTable, TT_EXACT, TT_ALPHA, TT_BETA, encodeMove } from '../src/engine/transposition.js';
 import { Move } from '../src/engine/move.js';
 import { Board } from '../src/engine/board.js';
+import { MoveGenerator } from '../src/engine/moveGen.js';
 import { boardFrom, play } from './helpers.js';
 
 const key = (hi, lo) => ({ hi, lo });
@@ -95,4 +96,23 @@ test('Zobrist keys: transpositions match, anything that matters differs', () => 
   const withEp = boardFrom('4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1');
   const withoutEp = boardFrom('4k3/8/8/3pP3/8/8/8/4K3 w - - 0 1');
   assert.notDeepEqual(hash(withEp), hash(withoutEp));
+});
+
+test('keys spread over every slot, however small the table', () => {
+  // The table picks a slot by the low bits of the key. Keys drawn from a plain
+  // linear congruential generator have almost periodic low bits and once left
+  // half of a 256-slot table unused; every slot must be reachable.
+  const tt = new TranspositionTable(8);
+  const slots = new Set();
+  const walk = (board, depth) => {
+    slots.add(tt.computeHash(board).lo & tt.mask);
+    if (depth === 0) return;
+    for (const move of new MoveGenerator(board).generateLegalMoves()) {
+      board.makeMove(move);
+      walk(board, depth - 1);
+      board.unmakeMove(move);
+    }
+  };
+  walk(new Board(), 3); // 9,322 positions
+  assert.equal(slots.size, 256);
 });

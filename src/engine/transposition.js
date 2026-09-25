@@ -10,10 +10,15 @@
 const PIECE_INDEX = { P: 0, N: 1, B: 2, R: 3, Q: 4, K: 5, p: 6, n: 7, b: 8, r: 9, q: 10, k: 11 };
 
 // Fixed seed, so a run is reproducible and every table shares the same keys.
+// Mulberry32, not a plain linear congruential generator: an LCG's low bits are
+// nearly periodic (bit 0 simply alternates), and the table picks a slot by the
+// low bits of the key, so LCG keys left most slots permanently empty.
 let seed = 42;
 function rand32() {
-  seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
-  return seed;
+  seed = (seed + 0x6D2B79F5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), seed | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return (t ^ (t >>> 14)) | 0;
 }
 function keys(count) {
   const hi = new Int32Array(count), lo = new Int32Array(count);
