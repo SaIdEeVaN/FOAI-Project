@@ -4,10 +4,9 @@
 import { MoveGenerator } from './moveGen.js';
 import { Evaluation } from './evaluation.js';
 import { TranspositionTable, TT_EXACT, TT_ALPHA, TT_BETA } from './transposition.js';
-import { scoreMove } from './search.js';
+import { scoreMove, NULL_MOVE_R, NULL_MIN_DEPTH } from './search.js';
 
 const MATE = 20000;
-const NULL_MOVE_R = 2;
 
 export const TECHNIQUES = ['alphaBeta', 'ordering', 'tt', 'quiescence', 'nullMove'];
 
@@ -96,7 +95,8 @@ export class TeachingSearch {
     if (!moves.length) return gen.isInCheck(stm) ? -MATE + ply : 0;
 
     // Null move: hand the opponent a free move; if we still beat beta, prune.
-    if (nullMove && alphaBeta && allowNull && depth > NULL_MOVE_R && beta !== Infinity &&
+    // Same rule as the game search, including how much depth must remain.
+    if (nullMove && alphaBeta && allowNull && depth >= NULL_MIN_DEPTH && beta !== Infinity &&
         !gen.isInCheck(stm) && this._hasPieces(stm)) {
       const ep = this.board.enPassant;
       this.board.enPassant = null;

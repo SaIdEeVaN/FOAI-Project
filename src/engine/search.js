@@ -6,12 +6,12 @@ const PIECE_ORDER = { P:1, N:3, B:3, R:5, Q:9, K:100, p:1, n:3, b:3, r:5, q:9, k
 
 export const MATE = 20000;
 const MATE_BOUND = 15000;
-const NULL_MOVE_R = 2;
+export const NULL_MOVE_R = 2;
 // Null move only where at least this many plies remain, so the reduced search
 // is always one full ply deep. Straight into quiescence it sees captures only,
 // is blind to a quiet mating threat, and on Win at Chess #1 cut the one line
 // that mates. In self-play the stricter limit cost nothing measurable (REPORT.md).
-const NULL_MIN_DEPTH = NULL_MOVE_R + 2;
+export const NULL_MIN_DEPTH = NULL_MOVE_R + 2;
 
 export class SearchEngine {
   // positionHistory is every position the real game has already stood in, oldest
