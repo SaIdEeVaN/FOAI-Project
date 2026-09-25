@@ -3,6 +3,8 @@ import { Board } from '../engine/board.js';
 import { MoveGenerator } from '../engine/moveGen.js';
 import { Evaluation } from '../engine/evaluation.js';
 import { configKey } from '../engine/teachingSearch.js';
+import { validateFen, normalizeFen } from '../engine/fen.js';
+import { lineToSan } from '../engine/san.js';
 import { Piece } from './PieceSymbols.jsx';
 
 const DEPTH = 5;
@@ -33,6 +35,27 @@ const EVAL_TERMS = [
 ];
 
 const QUEUED = { status: 'queued', nodes: 0, timeMs: 0 };
+
+// Sharp positions to load in one click. The sparse ones let plain minimax finish
+// at depth 5; Kiwipete shows what a busy position does to it.
+const PRESETS = [
+  { label: 'Opera mate', fen: '4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16',
+    note: 'Morphy, Paris 1858: 16.Qb8+! Nxb8 17.Rd8# — mate in two' },
+  { label: 'WAC 1', fen: '2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1',
+    note: 'Win at Chess #1: 1.Qg6! gxf6 2.Qh7# — mate in two' },
+  { label: 'WAC 4', fen: 'r1bq2rk/pp3pbp/2p1p1pQ/7P/3P4/2PB1N2/PP3PPR/2KR4 w - - 0 1',
+    note: 'Win at Chess #4: 1.Qxh7+! Kxh7 2.hxg6# — mate in two' },
+  { label: 'Rook endgame', fen: '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1',
+    note: 'Perft position 3: few pieces, few moves, deep lines' },
+  { label: 'Kiwipete', fen: 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1',
+    note: 'Perft position 2: 48 moves at the root; plain minimax runs into the 60-second bound' },
+];
+
+const fenOf = (boardState) => {
+  const board = new Board();
+  board.loadFrom(boardState);
+  return board.toFen();
+};
 
 // Node counts at a fixed depth are deterministic, so a finished search never needs repeating.
 const resultCache = new Map();
@@ -268,20 +291,41 @@ function EvalBreakdown({ breakdown }) {
 // ── Screen ────────────────────────────────────────────────────────────────
 export default function TeachingMode({ boardState, lastMove, flip }) {
   // Snapshot on open; the game can carry on underneath without changing this screen.
-  const [snapshot] = useState(() => ({ boardState, lastMove }));
+  const [gameSnapshot] = useState(() => ({ boardState, lastMove, flip, source: 'game', label: 'current game' }));
+  const [snapshot, setSnapshot] = useState(gameSnapshot);
+  const [fenText, setFenText] = useState(() => fenOf(boardState));
+  const [fenError, setFenError] = useState(null);
   const [toggles, setToggles] = useState(DEFAULT_TOGGLES);
   const [live, setLive] = useState({});
   const runnerRef = useRef(null);
 
   const positionKey = useMemo(() => JSON.stringify(snapshot.boardState), [snapshot]);
-  const { breakdown, hasMoves } = useMemo(() => {
+  const { board, breakdown, hasMoves } = useMemo(() => {
     const board = new Board();
     board.loadFrom(snapshot.boardState);
     return {
+      board,
       breakdown: new Evaluation().breakdown(board),
       hasMoves: new MoveGenerator(board).generateLegalMoves().length > 0,
     };
   }, [snapshot]);
+  const san = (uci) => (uci ? lineToSan(board, [uci])[0] ?? uci : '—');
+
+  // Any position typed or picked replaces the game snapshot, shown from the side to move.
+  const loadFen = (text, label) => {
+    const problem = validateFen(text);
+    setFenError(problem);
+    if (problem) return;
+    const loaded = new Board();
+    loaded.parseFen(normalizeFen(text));
+    setSnapshot({ boardState: loaded.serialize(), lastMove: null, flip: loaded.sideToMove === 'b', source: 'fen', label });
+    setFenText(loaded.toFen());
+  };
+  const backToGame = () => {
+    setSnapshot(gameSnapshot);
+    setFenText(fenOf(gameSnapshot.boardState));
+    setFenError(null);
+  };
 
   const custom = effectiveConfig(toggles);
   const cards = [
@@ -291,9 +335,13 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
   ].map(card => ({ ...card, key: configKey(card.config) }));
   const cardKeys = cards.map(c => c.key).join(',');
 
+  // Live progress is keyed by position as well as configuration, so switching
+  // positions never shows one position's numbers on another's cards.
   useEffect(() => {
-    const runner = createRunner(snapshot.boardState, positionKey, (key, patch) =>
-      setLive(prev => ({ ...prev, [key]: { ...prev[key], ...patch } })));
+    const runner = createRunner(snapshot.boardState, positionKey, (key, patch) => {
+      const id = `${positionKey}#${key}`;
+      setLive(prev => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+    });
     runnerRef.current = runner;
     return () => runner.stop();
   }, [snapshot, positionKey]);
@@ -301,9 +349,9 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
   useEffect(() => {
     // Cheapest first: pruned results land in seconds while plain minimax grinds on last.
     if (hasMoves) runnerRef.current.want([...cards].reverse());
-  }, [cardKeys, hasMoves]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cardKeys, hasMoves, positionKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const runs = cards.map(c => resultCache.get(`${positionKey}#${c.key}`) || live[c.key] || QUEUED);
+  const runs = cards.map(c => resultCache.get(`${positionKey}#${c.key}`) || live[`${positionKey}#${c.key}`] || QUEUED);
   const baseline = runs[0];
   const scaleNodes = baseline.status === 'done' ? baseline.nodes : Math.max(1, ...runs.map(r => r.nodes));
   const allDone = runs.every(r => r.status === 'done');
@@ -317,16 +365,16 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
 
   let caption;
   if (!hasMoves) {
-    caption = 'no legal moves — the game is over';
+    caption = 'no legal moves in this position';
   } else if (!allDone) {
     caption = 'searching…';
   } else if (runs.every(r => r.move === runs[0].move)) {
-    caption = <>all three agree: <span className="tm-accent">{runs[0].move}</span></>;
+    caption = <>all three agree: <span className="tm-accent">{san(runs[0].move)}</span></>;
   } else {
     caption = (
       <>best moves differ:{' '}
         {runs.map((r, i) => (
-          <span key={i}>{i > 0 && ' · '}<span style={{ color: STATUS_COLORS[i] }}>{r.move ?? '—'}</span></span>
+          <span key={i}>{i > 0 && ' · '}<span style={{ color: STATUS_COLORS[i] }}>{san(r.move)}</span></span>
         ))}
       </>
     );
@@ -337,7 +385,7 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
       <section className="tm" aria-labelledby="tm-title">
         <header className="tm-head">
           <h2 id="tm-title" className="tm-title">Teaching mode</h2>
-          <span className="tm-meta">position: current game · fixed depth {DEPTH}</span>
+          <span className="tm-meta">position: {snapshot.label} · fixed depth {DEPTH}</span>
         </header>
         <p className="tm-sub">
           Run the same position through three configurations and compare the work each one does.
@@ -362,11 +410,45 @@ export default function TeachingMode({ boardState, lastMove, flip }) {
 
         <div className="tm-body">
           <div className="tm-board-col">
-            <MiniBoard squares={snapshot.boardState.squares} lastMove={snapshot.lastMove} flip={flip} />
+            <MiniBoard squares={snapshot.boardState.squares} lastMove={snapshot.lastMove} flip={snapshot.flip} />
             <p className="tm-caption" aria-live="polite">{caption}</p>
           </div>
 
           <div className="tm-right">
+            <section className="tm-section">
+              <h3 className="tm-label">Position</h3>
+              <div className="tm-pills">
+                <button type="button" className={`tm-pill${snapshot.source === 'game' ? ' on' : ''}`}
+                  aria-pressed={snapshot.source === 'game'} onClick={backToGame}>
+                  <span className="tm-pill-dot" aria-hidden="true" />
+                  Current game
+                </button>
+                {PRESETS.map(p => (
+                  <button key={p.label} type="button" title={p.note}
+                    className={`tm-pill${snapshot.label === p.label ? ' on' : ''}`}
+                    aria-pressed={snapshot.label === p.label}
+                    onClick={() => loadFen(p.fen, p.label)}>
+                    <span className="tm-pill-dot" aria-hidden="true" />
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <form className="tm-fen" onSubmit={(e) => { e.preventDefault(); loadFen(fenText, 'custom FEN'); }}>
+                <input
+                  className={`tm-fen-input${fenError ? ' invalid' : ''}`}
+                  value={fenText}
+                  onChange={(e) => { setFenText(e.target.value); setFenError(null); }}
+                  aria-label="Position as FEN"
+                  aria-invalid={!!fenError}
+                  aria-describedby="tm-fen-error"
+                  spellCheck={false}
+                  autoComplete="off"
+                />
+                <button type="submit" className="btn btn-ghost">Load FEN</button>
+              </form>
+              <p id="tm-fen-error" className="tm-fen-error" aria-live="polite">{fenError}</p>
+            </section>
+
             <section className="tm-section">
               <h3 className="tm-label">Toggle a technique and re-run</h3>
               <div className="tm-pills">

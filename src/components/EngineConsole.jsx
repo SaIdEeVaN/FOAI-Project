@@ -17,7 +17,7 @@ export default function EngineConsole({ telemetry, logLines, evalScore, thinking
   const scoreTone = evalScore === 0 ? '' : evalScore > 0 ? ' accent' : ' warn';
 
   const stats = [
-    { key: 'Best move', value: telemetry?.move || '—', tone: ' accent' },
+    { key: 'Best move', value: telemetry?.san || telemetry?.move || '—', tone: ' accent' },
     { key: 'Depth', value: telemetry?.depth ?? '—' },
     { key: 'Nodes', value: fmtNodes(telemetry?.nodes ?? 0) },
     { key: 'Score', value: scoreStr, tone: scoreTone },
@@ -29,7 +29,9 @@ export default function EngineConsole({ telemetry, logLines, evalScore, thinking
         <h2 id="ec-label" className="panel-label">Engine console</h2>
         {thinking
           ? <span className="badge searching">searching…</span>
-          : <span className="panel-meta">idle</span>}
+          : <span className="panel-meta">
+              idle{telemetry?.hashfull != null && ` · table ${(telemetry.hashfull / 10).toFixed(0)}% full`}
+            </span>}
       </div>
 
       <div className="stat-grid">

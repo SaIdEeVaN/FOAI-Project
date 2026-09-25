@@ -1,3 +1,5 @@
+import { describeContempt } from './contempt.js';
+
 // Time controls in the chess.com / lichess style: "base+increment", base in
 // minutes and increment in seconds added after each move.
 
@@ -68,12 +70,16 @@ export function TimeControlOptions({ value, onChange }) {
 }
 
 // Read-only reminder beside the board of what this match is being played at.
-export function TimeControlSummary({ value }) {
+export function MatchSummary({ timeControl, contempt }) {
   return (
     <section className="panel tc-panel" aria-labelledby="tc-label">
       <div className="panel-head tc-summary">
         <h2 id="tc-label" className="panel-label">Time control</h2>
-        <span className="tc-current">{describeTimeControl(value)}</span>
+        <span className="tc-current">{describeTimeControl(timeControl)}</span>
+      </div>
+      <div className="panel-head tc-summary tc-contempt">
+        <h3 className="panel-label">Engine contempt</h3>
+        <span className="panel-meta">{describeContempt(contempt)}</span>
       </div>
     </section>
   );

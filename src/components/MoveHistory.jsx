@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+// `moves` is the game so far as { uci, san }; the list shows SAN.
 export default function MoveHistory({ moves }) {
   const scrollRef = useRef(null);
 
@@ -11,7 +12,7 @@ export default function MoveHistory({ moves }) {
 
   const pairs = [];
   for (let i = 0; i < moves.length; i += 2) {
-    pairs.push({ num: Math.floor(i / 2) + 1, white: moves[i], black: moves[i + 1] || '' });
+    pairs.push({ num: Math.floor(i / 2) + 1, white: moves[i].san, black: moves[i + 1]?.san || '' });
   }
   const latest = moves.length - 1;
 
@@ -23,7 +24,7 @@ export default function MoveHistory({ moves }) {
       </div>
 
       {!pairs.length ? (
-        <p className="empty">No moves yet — click a piece to start.</p>
+        <p className="empty">No moves yet — click a piece or type a move to start.</p>
       ) : (
         <div className="move-table" ref={scrollRef}>
           <div className="move-row move-head-row">

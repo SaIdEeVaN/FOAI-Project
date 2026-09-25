@@ -5,14 +5,17 @@ import { MoveGenerator } from './engine/moveGen.js';
 import { Evaluation } from './engine/evaluation.js';
 import { uciToSq } from './engine/move.js';
 import { premoveTargets } from './engine/premove.js';
+import { toSan, parseMove } from './engine/san.js';
 import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
+import MoveEntry from './components/MoveEntry.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
 import TeachingMode from './components/TeachingMode.jsx';
 import { GameOverModal, NewGameModal, PromotionModal } from './components/Modals.jsx';
 import { Piece, pieceName } from './components/PieceSymbols.jsx';
 import { formatScore, isMate, mateIn, MATE_SCORE } from './components/score.js';
-import { Clock, TimeControlSummary, findTimeControl, isTimed } from './components/TimeControl.jsx';
+import { Clock, MatchSummary, findTimeControl, isTimed } from './components/TimeControl.jsx';
+import { clampContempt } from './components/contempt.js';
 import './index.css';
 
 const INITIAL_BOARD = new Board();
@@ -32,6 +35,19 @@ function loadTimeControl() {
 }
 function saveTimeControl(tc) {
   try { localStorage.setItem(TC_KEY, tc.id); } catch { /* not persisted */ }
+}
+
+// Engine contempt in centipawns, remembered the same way. Positive: the engine
+// plays on rather than accept a draw; negative: it is happy to take one.
+const CONTEMPT_KEY = 'foai-contempt';
+function loadContempt() {
+  try {
+    const v = Number(localStorage.getItem(CONTEMPT_KEY));
+    return Number.isFinite(v) ? clampContempt(v) : 0;
+  } catch { return 0; }
+}
+function saveContempt(cp) {
+  try { localStorage.setItem(CONTEMPT_KEY, String(cp)); } catch { /* not persisted */ }
 }
 
 // How long the engine may think on a clock: a slice of what is left plus most of
@@ -141,7 +157,7 @@ export default function App() {
   const [selectedSq, setSelectedSq] = useState(null);
   const [legalTargets, setLegalTargets] = useState([]);
   const [lastMove, setLastMove] = useState(null);
-  const [moveHistory, setMoveHistory] = useState([]);
+  const [moveHistory, setMoveHistory] = useState([]); // [{ uci, san }]
   const [engineThinking, setEngineThinking] = useState(false);
   const [gameEnd, setGameEnd] = useState(null);
   const [telemetry, setTelemetry] = useState(null);
@@ -157,6 +173,10 @@ export default function App() {
   const premoveRef = useRef(null);
   const setPremove = (pm) => { premoveRef.current = pm; setPremoveState(pm); };
   const [timeControl, setTimeControl] = useState(loadTimeControl);
+  const [contempt, setContempt] = useState(loadContempt);
+  const contemptRef = useRef(contempt);
+  // Closing the game-over card leaves the finished game on the board.
+  const [resultDismissed, setResultDismissed] = useState(false);
   // Every match opens with the new-game dialog; nothing moves until it is started,
   // and its time control holds until the match is over.
   const [setupOpen, setSetupOpen] = useState(true);
@@ -195,7 +215,7 @@ export default function App() {
     const { type, payload } = e.data;
     if ((type === 'progress' || type === 'result') && payload.id !== searchIdRef.current) return;
     if (type === 'progress') {
-      const line = `d${payload.depth}  score ${formatScore(payload.score, { sign: true })}  nodes ${payload.nodes.toLocaleString()}  ${payload.move || ''}`;
+      const line = `d${payload.depth}  score ${formatScore(payload.score, { sign: true })}  nodes ${payload.nodes.toLocaleString()}  ${payload.san || ''}`;
       setLogLines(prev => [...prev.slice(-20), line]);
       setTelemetry(payload);
       // Live bar: each finished iteration is the engine's current opinion.
@@ -378,13 +398,14 @@ export default function App() {
   const _executeMove = (move) => {
     const mover = boardRef.current.sideToMove;
     if (outOfTime(mover)) { flag(mover); return; }
+    const san = toSan(boardRef.current, move);
     boardRef.current.makeMove(move);
     positionsRef.current.push(boardRef.current.positionKey());
     pressClock(mover);
     setSelectedSq(null);
     setLegalTargets([]);
     setLastMove({ from: move.startSq, to: move.targetSq });
-    setMoveHistory(prev => [...prev, move.toUci()]);
+    setMoveHistory(prev => [...prev, { uci: move.toUci(), san }]);
     setEvalScore(staticEval(boardRef.current));
     setConfirmResign(false);
     syncState();
@@ -405,6 +426,7 @@ export default function App() {
           ? engineBudget(readClock()[other(playerColorRef.current)], timeControlRef.current.inc)
           : 2000,
         positionHistory: positionsRef.current,
+        contempt: contemptRef.current,
       },
     });
   }, []);
@@ -429,16 +451,17 @@ export default function App() {
 
     const mover = boardRef.current.sideToMove;
     if (outOfTime(mover)) { flag(mover); return; }
+    const san = toSan(boardRef.current, move, legal);
     boardRef.current.makeMove(move);
     positionsRef.current.push(boardRef.current.positionKey());
     pressClock(mover);
     setLastMove({ from, to });
-    setMoveHistory(prev => [...prev, payload.uci]);
+    setMoveHistory(prev => [...prev, { uci: payload.uci, san }]);
     // The search scores from the mover's point of view; the bar reads from White's.
     // A mate is one ply closer once the engine's move is on the board.
     const score = isMate(payload.score) ? payload.score + Math.sign(payload.score) : payload.score;
     setEvalScore(playerColorRef.current === 'w' ? -score : score);
-    setTelemetry({ depth: payload.depth, nodes: payload.nodes, score: payload.score, move: payload.uci });
+    setTelemetry({ depth: payload.depth, nodes: payload.nodes, score: payload.score, move: payload.uci, san, hashfull: payload.hashfull });
     syncState();
 
     const end = detectGameEnd(boardRef.current, positionsRef.current);
@@ -484,6 +507,7 @@ export default function App() {
     setLastMove(null);
     setMoveHistory([]);
     setGameEnd(null);
+    setResultDismissed(false);
     setTelemetry(null);
     setLogLines([]);
     setEvalScore(0);
@@ -493,9 +517,12 @@ export default function App() {
   const newGame = () => setSetupOpen(true);
 
   // Start button of the new-game dialog.
-  const beginGame = (tc, pick) => {
+  const beginGame = (tc, pick, cp) => {
     setTimeControl(tc);
     saveTimeControl(tc);
+    setContempt(cp);
+    contemptRef.current = cp;
+    saveContempt(cp);
     setSidePick(pick);
     startGame(pick === 'random' ? randomColor() : pick, tc);
     setGameStarted(true);
@@ -531,7 +558,7 @@ export default function App() {
     const replayMoves = moveHistory.slice(0, keep);
     boardRef.current.reset();
     const keys = [boardRef.current.positionKey()];
-    for (const uci of replayMoves) {
+    for (const { uci } of replayMoves) {
       const legal = new MoveGenerator(boardRef.current).generateLegalMoves();
       const move = legal.find(m => m.toUci() === uci);
       if (move) {
@@ -541,12 +568,25 @@ export default function App() {
     }
     positionsRef.current = keys;
     setMoveHistory(replayMoves);
-    setLastMove(replayMoves.length ? { from: uciToSq(replayMoves.at(-1).slice(0,2)), to: uciToSq(replayMoves.at(-1).slice(2,4)) } : null);
+    const lastUci = replayMoves.at(-1)?.uci;
+    setLastMove(lastUci ? { from: uciToSq(lastUci.slice(0, 2)), to: uciToSq(lastUci.slice(2, 4)) } : null);
     setSelectedSq(null);
     setLegalTargets([]);
     setGameEnd(null);
+    setResultDismissed(false);
     setEvalScore(staticEval(boardRef.current));
     syncState();
+  };
+
+  // A move typed in SAN (or UCI). Returns an error message, or null once played.
+  const submitTypedMove = (text) => {
+    if (!gameStarted || gameEnd) return 'The game is not running.';
+    if (engineThinking || boardRef.current.sideToMove !== playerColor) return 'Wait for your turn.';
+    const { move, error } = parseMove(boardRef.current, text);
+    if (error) return error;
+    setPremove(null);
+    _executeMove(move);
+    return null;
   };
 
   // ── Status text ───────────────────────────────────────────────────────────
@@ -662,11 +702,20 @@ export default function App() {
               {confirmResign ? 'Confirm resign?' : 'Resign'}
             </button>
           </div>
+
+          <MoveEntry
+            onSubmit={submitTypedMove}
+            disabled={!gameStarted || !!gameEnd || engineThinking || sideToMove !== playerColor}
+            placeholder={!gameStarted ? 'Start a game to type moves'
+              : gameEnd ? 'Game over'
+              : sideToMove !== playerColor ? 'Engine thinking…'
+              : 'Type a move: e4, Nf3, O-O'}
+          />
         </section>
 
         {/* Right — info */}
         <section className="info-section">
-          <TimeControlSummary value={timeControl} />
+          <MatchSummary timeControl={timeControl} contempt={contempt} />
           <MoveHistory moves={moveHistory} />
           <EngineConsole
             telemetry={telemetry}
@@ -679,8 +728,12 @@ export default function App() {
       )}
 
       <AnimatePresence>
-        {gameEnd && view === 'play' && !setupOpen && (
-          <GameOverModal gameEnd={gameEnd} onPlayAgain={newGame} />
+        {gameEnd && view === 'play' && !setupOpen && !resultDismissed && (
+          <GameOverModal
+            gameEnd={gameEnd}
+            onClose={() => setResultDismissed(true)}
+            onNewGame={() => { setResultDismissed(true); newGame(); }}
+          />
         )}
       </AnimatePresence>
 
@@ -688,6 +741,7 @@ export default function App() {
         {setupOpen && view === 'play' && (
           <NewGameModal
             timeControl={timeControl}
+            contempt={contempt}
             side={sidePick}
             onStart={beginGame}
             onCancel={gameStarted ? () => setSetupOpen(false) : undefined}

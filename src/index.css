@@ -961,3 +961,67 @@ html, body, #root {
 .setup-sides .tc-btn { flex: 1; font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; }
 .setup-sides .pc { width: 18px; height: 18px; }
 .setup-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+/* ── Contempt ─────────────────────────────────────────────────────────── */
+.tc-contempt { margin-top: 8px; }
+.setup-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.setup-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.setup-range { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.setup-range-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: -6px;
+}
+
+/* ── Game over ────────────────────────────────────────────────────────── */
+.modal-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Typed moves and FEN entry ────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.move-entry-row,
+.tm-fen {
+  display: flex;
+  gap: 8px;
+}
+.move-input,
+.tm-fen-input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s;
+}
+.move-input::placeholder { color: var(--muted); font-family: var(--font-sans); }
+.move-input:focus,
+.tm-fen-input:focus { outline: none; border-color: var(--accent); }
+.move-input:disabled { opacity: 0.5; }
+.move-input.invalid,
+.tm-fen-input.invalid { border-color: var(--red); }
+.move-entry-error,
+.tm-fen-error {
+  min-height: 16px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--red);
+}
+.tm-fen { margin-top: 10px; }
+.tm-fen-input { font-size: 11px; }

@@ -1,18 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Piece, pieceName } from './PieceSymbols.jsx';
 import { TimeControlOptions } from './TimeControl.jsx';
+import { CONTEMPT_LIMIT, CONTEMPT_STEP, describeContempt } from './contempt.js';
 
 const CARD_IN  = { scale: 0.75, opacity: 0, y: 30 };
 const CARD_MID = { scale: 1, opacity: 1, y: 0 };
 const CARD_OUT = { scale: 0.85, opacity: 0, y: 20 };
 const SPRING   = { type: 'spring', stiffness: 400, damping: 28 };
 
-export function GameOverModal({ gameEnd, onPlayAgain }) {
+// Closing the card — its main button, a click outside it or Escape — goes back
+// to the board with the finished game still on it. A new game is one click
+// away, but only when asked for.
+export function GameOverModal({ gameEnd, onClose, onNewGame }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   return (
     <motion.div
       className="overlay"
-      onClick={onPlayAgain}
+      onClick={onClose}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -22,6 +32,7 @@ export function GameOverModal({ gameEnd, onPlayAgain }) {
         className="modal"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="game-over-title"
         onClick={e => e.stopPropagation()}
         initial={CARD_IN}
         animate={CARD_MID}
@@ -38,7 +49,7 @@ export function GameOverModal({ gameEnd, onPlayAgain }) {
             : <span className="modal-draw">½</span>}
         </motion.span>
         <p className="modal-eyebrow">Game over</p>
-        <h2 className="modal-title">
+        <h2 id="game-over-title" className="modal-title">
           {gameEnd.winner ? `${gameEnd.winner} wins` : 'Draw'}
         </h2>
         <p className="modal-sub">
@@ -47,7 +58,10 @@ export function GameOverModal({ gameEnd, onPlayAgain }) {
             : gameEnd.type === 'timeout' ? 'on time'
             : `by ${gameEnd.reason.toLowerCase()}`}
         </p>
-        <button className="btn btn-primary" onClick={onPlayAgain}>Play again</button>
+        <div className="modal-actions">
+          <button className="btn btn-ghost" onClick={onNewGame}>New game</button>
+          <button className="btn btn-primary" onClick={onClose} autoFocus>Back to board</button>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -109,9 +123,10 @@ const SIDES = [
 
 // Shown before every match: the time control is fixed here and cannot change once
 // the game is under way. `onCancel` is absent when there is no game to go back to.
-export function NewGameModal({ timeControl, side, onStart, onCancel }) {
+export function NewGameModal({ timeControl, contempt, side, onStart, onCancel }) {
   const [tc, setTc] = useState(timeControl);
   const [pick, setPick] = useState(side);
+  const [cp, setCp] = useState(contempt);
 
   return (
     <motion.div
@@ -155,9 +170,31 @@ export function NewGameModal({ timeControl, side, onStart, onCancel }) {
           </div>
         </section>
 
+        <section className="setup-section">
+          <div className="setup-label-row">
+            <label className="modal-eyebrow" htmlFor="setup-contempt">Engine contempt</label>
+            <span className="setup-value">{describeContempt(cp)}</span>
+          </div>
+          <input
+            id="setup-contempt"
+            className="setup-range"
+            type="range"
+            min={-CONTEMPT_LIMIT}
+            max={CONTEMPT_LIMIT}
+            step={CONTEMPT_STEP}
+            value={cp}
+            onChange={e => setCp(Number(e.target.value))}
+            aria-valuetext={describeContempt(cp)}
+          />
+          <div className="setup-range-ends" aria-hidden="true">
+            <span>Seeks draws</span>
+            <span>Avoids draws</span>
+          </div>
+        </section>
+
         <div className="setup-actions">
           {onCancel && <button className="btn btn-ghost" onClick={onCancel}>Back to game</button>}
-          <button className="btn btn-primary" onClick={() => onStart(tc, pick)} autoFocus>Start game</button>
+          <button className="btn btn-primary" onClick={() => onStart(tc, pick, cp)} autoFocus>Start game</button>
         </div>
       </motion.div>
     </motion.div>
