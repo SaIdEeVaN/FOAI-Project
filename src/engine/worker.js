@@ -3,7 +3,15 @@ import { Board } from './board.js';
 import { SearchEngine } from './search.js';
 import { TeachingSearch } from './teachingSearch.js';
 import { MoveGenerator } from './moveGen.js';
-import { Move } from './move.js';
+import { TranspositionTable } from './transposition.js';
+import { toSan, lineToSan } from './san.js';
+
+// One transposition table for the whole game. Its size is fixed, so keeping it
+// between moves costs nothing extra, and what one search learned helps the next.
+// Draw scores depend on which side the engine plays and on its contempt, so the
+// table starts afresh when either changes.
+let gameTT = null;
+let gameTTFor = null;
 
 self.onmessage = (e) => {
   const { type, payload } = e.data;
@@ -11,13 +19,22 @@ self.onmessage = (e) => {
   if (type === 'search') {
     const board = new Board();
     board.loadFrom(payload.boardState);
+    const contempt = payload.contempt || 0;
+
+    const owner = `${board.sideToMove} ${contempt}`;
+    if (!gameTT) gameTT = new TranspositionTable();
+    if (owner !== gameTTFor) { gameTT.clear(); gameTTFor = owner; }
 
     // The id is echoed back so the page can drop a search it has since abandoned.
     const { id } = payload;
-    const engine = new SearchEngine(board, payload.positionHistory || []);
+    const engine = new SearchEngine(board, payload.positionHistory || [], { tt: gameTT, contempt });
+    // Progress is reported between iterations, with the board back at the root.
     const { bestMove, depth, nodes, score } = engine.getBestMove(
       payload.timeLimitMs || 2000,
-      (info) => self.postMessage({ type: 'progress', payload: { id, ...info } })
+      (info) => self.postMessage({
+        type: 'progress',
+        payload: { id, ...info, san: info.move ? lineToSan(board, [info.move])[0] : null },
+      })
     );
 
     self.postMessage({
@@ -25,9 +42,11 @@ self.onmessage = (e) => {
       payload: {
         id,
         uci: bestMove ? bestMove.toUci() : null,
+        san: bestMove ? toSan(board, bestMove) : null,
         depth,
         nodes,
         score,
+        hashfull: gameTT.hashfull(),
       },
     });
   }

@@ -64,7 +64,7 @@ export class TeachingSearch {
     let alpha = -Infinity;
     const beta = Infinity;
     let best = null, bestScore = -Infinity;
-    for (const move of this._maybeOrder(moves, null)) {
+    for (const move of this._maybeOrder(moves, 0)) {
       this.board.makeMove(move);
       const score = -this._negamax(depth - 1, 1, -beta, -alpha, true);
       this.board.unmakeMove(move);
@@ -82,10 +82,10 @@ export class TeachingSearch {
 
     if (depth <= 0) return quiescence ? this._quiescence(alpha, beta) : this._staticEval();
 
-    let hk = null, ttMove = null;
+    let hk = null, ttMove = 0;
     if (this.tt) {
       hk = this.tt.computeHash(this.board);
-      const [ttVal, move] = this.tt.lookup(hk, depth, alpha, beta);
+      const [ttVal, move] = this.tt.lookup(hk, depth, alpha, beta, ply);
       if (ttVal !== null) return ttVal;
       ttMove = move;
     }
@@ -124,7 +124,7 @@ export class TeachingSearch {
 
     if (this.tt) {
       const flag = bestScore <= origAlpha ? TT_ALPHA : bestScore >= beta ? TT_BETA : TT_EXACT;
-      this.tt.store(hk, depth, bestScore, flag, bestMove);
+      this.tt.store(hk, depth, bestScore, flag, bestMove, ply);
     }
     return bestScore;
   }
@@ -141,7 +141,7 @@ export class TeachingSearch {
 
     let best = standPat;
     const captures = new MoveGenerator(this.board).generateLegalMoves().filter(m => m.pieceCaptured !== '.');
-    for (const move of this._maybeOrder(captures, null)) {
+    for (const move of this._maybeOrder(captures, 0)) {
       this.board.makeMove(move);
       const score = -this._quiescence(-beta, -alpha);
       this.board.unmakeMove(move);
