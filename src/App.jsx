@@ -4,6 +4,7 @@ import { Board, hasThreefoldRepetition } from './engine/board.js';
 import { MoveGenerator } from './engine/moveGen.js';
 import { Evaluation } from './engine/evaluation.js';
 import { uciToSq } from './engine/move.js';
+import { premoveTargets } from './engine/premove.js';
 import ChessBoard from './components/ChessBoard.jsx';
 import MoveHistory from './components/MoveHistory.jsx';
 import EngineConsole from './components/EngineConsole.jsx';
@@ -128,6 +129,11 @@ export default function App() {
   const [pendingPromotion, setPendingPromotion] = useState(null); // { from, to, color }
   const [view, setView] = useState('play'); // 'play' | 'teach'
   const [confirmResign, setConfirmResign] = useState(false);
+  // A move queued while the engine thinks, played the moment it replies: { from, to }.
+  // Mirrored in a ref because the engine's reply is handled in a stale closure.
+  const [premove, setPremoveState] = useState(null);
+  const premoveRef = useRef(null);
+  const setPremove = (pm) => { premoveRef.current = pm; setPremoveState(pm); };
   const workerRef = useRef(null);
   // Id of the search whose messages still count. Resigning or starting a new game
   // bumps it, so a search already running in the worker is ignored when it lands.
@@ -179,10 +185,33 @@ export default function App() {
 
   // ── Square click ──────────────────────────────────────────────────────────
   const onSquareClick = useCallback((sq) => {
-    if (gameEnd || engineThinking) return;
-    if (boardRef.current.sideToMove !== playerColor) return;
-
+    if (gameEnd) return;
     const piece = boardRef.current.squares[sq];
+    const isOwnPiece = piece !== '.' && (playerColor === 'w' ? piece === piece.toUpperCase() : piece === piece.toLowerCase());
+
+    // The engine's turn: clicks queue (or cancel) a premove instead.
+    if (engineThinking || boardRef.current.sideToMove !== playerColor) {
+      if (premoveRef.current) {
+        setPremove(null);
+        setSelectedSq(null);
+        setLegalTargets([]);
+        return;
+      }
+      if (selectedSq !== null && legalTargets.includes(sq)) {
+        setPremove({ from: selectedSq, to: sq });
+        setSelectedSq(null);
+        setLegalTargets([]);
+        return;
+      }
+      if (isOwnPiece && sq !== selectedSq) {
+        setSelectedSq(sq);
+        setLegalTargets(premoveTargets(boardRef.current.squares, boardRef.current.castlingRights, sq));
+        return;
+      }
+      setSelectedSq(null);
+      setLegalTargets([]);
+      return;
+    }
 
     // If a piece is selected and we click a legal target — make move
     if (selectedSq !== null && legalTargets.includes(sq)) {
@@ -191,7 +220,7 @@ export default function App() {
     }
 
     // Select own piece
-    if (piece !== '.' && (playerColor === 'w' ? piece === piece.toUpperCase() : piece === piece.toLowerCase())) {
+    if (isOwnPiece) {
       setSelectedSq(sq);
       setLegalTargets([]);
       // Compute legal moves in worker
@@ -294,7 +323,24 @@ export default function App() {
     syncState();
 
     const end = detectGameEnd(boardRef.current, positionsRef.current);
-    if (end) endGame(end);
+    if (end) { endGame(end); setPremove(null); return; }
+
+    // Anything picked during the engine's turn was for a premove; drop it.
+    setSelectedSq(null);
+    setLegalTargets([]);
+    playPremove();
+  };
+
+  // Play the queued premove if the engine's reply left it legal; otherwise drop it.
+  // A premoved pawn reaching the last rank becomes a queen.
+  const playPremove = () => {
+    const pm = premoveRef.current;
+    if (!pm) return;
+    setPremove(null);
+    const legal = new MoveGenerator(boardRef.current).generateLegalMoves()
+      .filter(m => m.startSq === pm.from && m.targetSq === pm.to);
+    const move = legal.find(m => m.promotionPiece === '.' || m.promotionPiece.toLowerCase() === 'q');
+    if (move) _executeMove(move);
   };
 
   // Checkmate pins the bar to the winner and labels it "#".
@@ -306,6 +352,7 @@ export default function App() {
   // A fresh game, on a random side unless one is asked for.
   const startGame = (color = randomColor()) => {
     searchIdRef.current++;
+    setPremove(null);
     setConfirmResign(false);
     setPlayerColor(color);
     boardRef.current.reset();
@@ -329,6 +376,7 @@ export default function App() {
     if (gameEnd) return;
     if (!confirmResign) { setConfirmResign(true); return; }
     searchIdRef.current++; // Drop any search still running
+    setPremove(null);
     setConfirmResign(false);
     setEngineThinking(false);
     setSelectedSq(null);
@@ -378,7 +426,7 @@ export default function App() {
       : gameEnd.type === 'resign' ? `You resigned — ${gameEnd.winner} wins`
       : `Draw — ${gameEnd.reason}`;
   } else if (engineThinking || sideToMove !== playerColor) {
-    statusText = 'Engine thinking…';
+    statusText = premove ? 'Premove set' : 'Engine thinking…';
   } else {
     statusText = 'Your turn';
   }
@@ -444,7 +492,9 @@ export default function App() {
               legalTargets={legalTargets}
               lastMove={lastMove}
               checkSq={kingSq}
+              premove={premove}
               onSquareClick={onSquareClick}
+              onCancelPremove={() => { setPremove(null); setSelectedSq(null); setLegalTargets([]); }}
               flip={flip}
             />
           </div>

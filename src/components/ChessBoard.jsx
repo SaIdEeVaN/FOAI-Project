@@ -31,7 +31,7 @@ function ChessPiece({ piece, isCapture }) {
   );
 }
 
-export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove, checkSq, onSquareClick, flip = false }) {
+export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove, checkSq, premove, onSquareClick, onCancelPremove, flip = false }) {
   const [hasEntered, setHasEntered] = useState(false);
   const prevSquares = useRef(squares);
 
@@ -53,7 +53,8 @@ export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove
   }, [squares]);
 
   return (
-    <div className="board-frame">
+    // Right-click anywhere on the board cancels a premove, as on most chess sites.
+    <div className="board-frame" onContextMenu={(e) => { e.preventDefault(); onCancelPremove?.(); }}>
       <LayoutGroup>
         <div className="board-grid" role="group" aria-label="Chess board">
           {Array.from({ length: 64 }).map((_, i) => {
@@ -74,6 +75,7 @@ export default function ChessBoard({ squares, selectedSq, legalTargets, lastMove
             if (isLastFrom) cls += ' last-from';
             if (isLastTo) cls += ' last-to';
             if (isCheck) cls += ' in-check';
+            if (premove && (premove.from === sq || premove.to === sq)) cls += ' premove';
 
             // Coordinates ride in the margins of the board itself, so the grid stays flush
             // with the evaluation bar beside it.

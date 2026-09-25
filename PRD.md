@@ -78,6 +78,7 @@ external GUIs.
 | P12 | Move history lists the game in UCI, newest move highlighted and scrolled into view | Done |
 | P13 | Engine console reports best move, depth, nodes and score, plus a line per deepening iteration | Done |
 | P14 | The engine heads for a repetition when it is losing and steers clear of one when it is winning | Done |
+| P15 | Premoves: while the engine thinks the player may queue one move, highlighted on the board. It is played the moment the engine replies if still legal (a promotion becomes a queen), otherwise dropped. Any click or a right-click cancels it | Done |
 
 ## 6. Functional requirements — Teaching mode
 

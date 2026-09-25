@@ -15,6 +15,7 @@ The AI opponent runs entirely in the browser using a custom chess engine with:
 | Feature | Details |
 |---|---|
 | Play vs AI | Each game puts you on a random side; *Play as White/Black* restarts on the other side until you have moved |
+| Premoves | Queue a move while the engine thinks; it plays the instant the engine replies, if still legal. Click or right-click to cancel |
 | Legal move hints | Click a piece to see valid squares |
 | Last-move highlight | The previous move is highlighted on the board |
 | Check indicator | The king square turns red when in check |

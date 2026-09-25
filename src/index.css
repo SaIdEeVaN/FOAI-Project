@@ -335,6 +335,8 @@ html, body, #root {
 .square.light { background: var(--sq-light); }
 .square.dark  { background: var(--sq-dark); }
 .square.selected { background: var(--sq-selected) !important; }
+.square.premove { background: color-mix(in srgb, #D0543C 55%, var(--sq-light)) !important; }
+.square.dark.premove { background: color-mix(in srgb, #D0543C 55%, var(--sq-dark)) !important; }
 .square.last-from { background: color-mix(in srgb, var(--sq-last) 60%, var(--sq-light)) !important; }
 .square.dark.last-from { background: color-mix(in srgb, var(--sq-last) 60%, var(--sq-dark)) !important; }
 .square.last-to { background: color-mix(in srgb, var(--sq-last) 80%, var(--sq-light)) !important; }
