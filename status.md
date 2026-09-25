@@ -121,4 +121,46 @@ both closed.
 - [x] `teachingSearch.js` deliberately left alone — repetition pruning would corrupt the perft
       equivalence that teaching mode exists to demonstrate. Re-checked: plain minimax depth 4 is
       still 206,604 nodes = cumulative perft, and alpha-beta still agrees with it
-- [ ] **Not done:** draw scores are a flat 0, with no contempt setting
+- [x] ~~Draw scores are a flat 0, with no contempt setting~~ — contempt added, see the last section
+
+
+## Future implementations — all six items
+
+- [x] **SAN.** `san.js`: `toSan` (captures, en passant, promotions, file/rank/square disambiguation,
+      castling, `+`/`#`), `lineToSan`, and `parseMove`, which reads SAN the way people type it or
+      UCI and says why a move cannot be played. Move list, engine console, engine log and the
+      teaching-mode caption are in SAN; a box under the board takes typed moves
+- [x] **FEN import in teaching mode.** `fen.js` validates with plain-language errors; `Board.toFen`.
+      Position row with *Current game*, five Stockfish-verified presets (Opera mate, WAC #1, WAC #4,
+      rook endgame, Kiwipete) and a FEN box. Fixed on the way: the search runner never restarted
+      when the position changed, so every card sat at "queued"
+- [x] **Null-move pruning in the game search.** R = 2 with a 4-ply guard. The first version (guard 3)
+      missed the mate in two on WAC #1 because the null search was pure quiescence. Self-play,
+      80 games each at 300 ms: null-move vs none +49 =11 −20 (+132 Elo); guard 4 vs guard 3
+      +28 =17 −35 (−30, 95% interval −100 to +37, not significant) — so guard 4
+- [x] **Contempt.** −100…+100 cp in the New game dialog; repetition, stalemate and fifty-move draws in
+      the tree score −contempt for the engine. Tested on a repetition and a stalemate trap
+- [x] **Bounded transposition table.** Typed arrays, 2^19 slots (~10 MB), 64-bit keys as two
+      32-bit halves, replacement: same key refreshed / older search gives way / deeper stays.
+      Mate scores stored per node. One table per game in the worker. Teaching-mode counts move by
+      ≤0.2% (58,356 → 58,464 on the start position at depth 5), same moves and scores
+- [x] **Automated tests.** 53 `node:test` tests, `npm test` (~4 s) and `npm run test:deep`; perft on
+      the 7 standard positions matches every published count to 4.9M leaves. CI runs the suite
+      before the build
+- [x] **Benchmark playing strength.** `bench/match.js` against Stockfish 19 with `UCI_LimitStrength`,
+      1 s per move, 128 games: 65.6% vs 1500, 34.4% vs 1700, 29.7% vs 1900, 28.1% vs 2100. Pooled
+      estimate 1697 ± 72; 1600 ± 89 from the two bracketing anchors. The curve does not fit one
+      logistic (the stronger settings lose too often), so REPORT.md reports 1600–1700
+- [x] **Experiments and report.** 917 teaching-search runs (17 positions × depths 1–7 × 8
+      configurations); alpha-beta, ordering and TT agree with minimax in all 79 comparable runs;
+      105-position Stockfish-verified tactical suite at 0.2/1/5 s; TT sizing and Fine #70; final
+      engine vs the pre-iteration engine +42 =17 −21 (+93 Elo). REPORT.md
+- [x] **Fixed on the way:** the Zobrist keys came from an LCG whose low bits are nearly periodic, so
+      the fixed-size table (which indexes by low bits) could only use half its slots — caught by a
+      fill rate that did not add up, fixed with Mulberry32, pinned by a test. Teaching mode's
+      null-move now uses the game search's 4-ply guard too
+- [x] **UI fix.** The game-over card returns to the board (button, click outside, Escape) instead of
+      opening the time-control dialog; *New game* is a second button
+- [x] Checked in Chromium on the production build: typed moves and errors, SAN list, contempt in the
+      dialog and the side panel, game-over → board, teaching presets and FEN errors, no horizontal
+      overflow at 390px
