@@ -13,6 +13,18 @@ export const NULL_MOVE_R = 2;
 // that mates. In self-play the stricter limit cost nothing measurable (REPORT.md).
 export const NULL_MIN_DEPTH = NULL_MOVE_R + 2;
 
+// Move ordering bands. Every capture and promotion sorts above both killers,
+// and the killers above every quiet move the history table has seen; the bands
+// are far enough apart that no score from one can reach the next.
+const ORDER_HASH = 1_000_000;
+const ORDER_NOISY = 100_000;
+const ORDER_KILLER_1 = 90_000;
+const ORDER_KILLER_2 = 80_000;
+// History scores are halved whenever one passes this, so they stay below the
+// killers and the table keeps favouring what worked recently.
+const HISTORY_MAX = 60_000;
+const MAX_PLY = 128;
+
 export class SearchEngine {
   // positionHistory is every position the real game has already stood in, oldest
   // first, ending with the position at the root. Without it the search can only
@@ -27,7 +39,11 @@ export class SearchEngine {
   //             position. Negative: it welcomes a draw. 0: a draw is worth 0.
   //   nullMove  null-move pruning on or off (on by default).
   //   nullMinDepth  the fewest plies left at which a null move is tried.
-  constructor(board, positionHistory = [], { tt = null, contempt = 0, nullMove = true, nullMinDepth = NULL_MIN_DEPTH } = {}) {
+  //   killers   killer-move ordering on or off (on by default).
+  //   history   history-heuristic ordering on or off (on by default).
+  constructor(board, positionHistory = [], {
+    tt = null, contempt = 0, nullMove = true, nullMinDepth = NULL_MIN_DEPTH, killers = true, history = true,
+  } = {}) {
     this.board = board;
     this.gameHistory = positionHistory;
     this.evaluator = new Evaluation();
@@ -35,6 +51,14 @@ export class SearchEngine {
     this.contempt = contempt;
     this.nullMove = nullMove;
     this.nullMinDepth = nullMinDepth;
+    this.useKillers = killers;
+    this.useHistory = history;
+    // Two killer slots per ply: the last two quiet moves that caused a beta
+    // cutoff at that distance from the root, packed as the table packs moves.
+    this.killers = new Int32Array(MAX_PLY * 2);
+    // history[side][from][to]: how often, and how deep, a quiet move has
+    // refuted a position anywhere in the tree. Indexed side * 4096 + from * 64 + to.
+    this.history = new Int32Array(2 * 64 * 64);
     this.nodes = 0;
     this.maxDepth = 0;
     this.startTime = 0;
@@ -54,12 +78,18 @@ export class SearchEngine {
     this.repKeys = [...this.gameHistory];
     this.rootSide = this.board.sideToMove;
     this.tt.newSearch();
+    // The app and the benchmarks build a new engine for every move, so both
+    // tables normally start empty. If an engine is reused, killers start afresh
+    // (they belong to plies of one search) and history carries over at half
+    // weight: a move that refuted things last time is still a fair first guess.
+    this.killers.fill(0);
+    for (let i = 0; i < this.history.length; i++) this.history[i] >>= 1;
 
     let bestMove = null;
     let finalScore = 0;
 
     for (let depth = 1; depth <= maxDepth; depth++) {
-      if (Date.now() - this.startTime >= this.timeLimitMs) break;
+      if (depth > 1 && Date.now() - this.startTime >= this.timeLimitMs) break;
       this.maxDepth = depth;
       const [score, move] = this._root(depth, -Infinity, Infinity);
       if (this.abort) break;
@@ -71,9 +101,11 @@ export class SearchEngine {
     return { bestMove, depth: this.maxDepth, nodes: this.nodes, score: finalScore };
   }
 
+  // Depth 1 always runs to the end, however short the time: it is a few
+  // thousand nodes at most, and without it there would be no move to play.
   _checkTime() {
     this.nodes++;
-    if ((this.nodes & 2047) === 0 && Date.now() - this.startTime >= this.timeLimitMs) {
+    if ((this.nodes & 2047) === 0 && this.maxDepth > 1 && Date.now() - this.startTime >= this.timeLimitMs) {
       this.abort = true;
     }
   }
@@ -85,7 +117,7 @@ export class SearchEngine {
 
     const hk = this.tt.computeHash(this.board);
     const [, ttMove] = this.tt.lookup(hk, depth, alpha, beta, 0);
-    const ordered = this._order(moves, ttMove);
+    const ordered = this._order(moves, ttMove, 0);
 
     let best = null, bestScore = -Infinity;
     for (const move of ordered) {
@@ -133,7 +165,7 @@ export class SearchEngine {
       if (score >= beta) return beta;
     }
 
-    const ordered = this._order(moves, ttMove);
+    const ordered = this._order(moves, ttMove, ply);
     let bestScore = -Infinity, origAlpha = alpha, bestMove = null;
 
     for (const move of ordered) {
@@ -145,7 +177,10 @@ export class SearchEngine {
       this.board.unmakeMove(move);
       if (score > bestScore) { bestScore = score; bestMove = move; }
       if (score > alpha) alpha = score;
-      if (alpha >= beta) break;
+      if (alpha >= beta) {
+        this._rememberCutoff(move, ply, depth);
+        break;
+      }
     }
     if (this.abort) return 0;
 
@@ -207,7 +242,7 @@ export class SearchEngine {
 
     const gen = new MoveGenerator(this.board);
     const captures = gen.generateLegalMoves().filter(m => m.pieceCaptured !== '.');
-    for (const move of this._order(captures, 0)) {
+    for (const move of this._order(captures, 0, -1)) {
       if (this.abort) return 0;
       this.board.makeMove(move);
       const score = -this._quiescence(-beta, -alpha);
@@ -218,8 +253,54 @@ export class SearchEngine {
     return alpha;
   }
 
-  _order(moves, ttMove) {
-    return moves.slice().sort((a, b) => scoreMove(b, ttMove) - scoreMove(a, ttMove));
+  // Hash move, then captures and promotions by MVV-LVA, then the two killers
+  // for this ply, then the remaining quiet moves by history score. `ply` is -1
+  // in quiescence, which has only captures and no killers. Scores are worked
+  // out once per move rather than inside the comparator; the sort is stable,
+  // so ties keep generation order.
+  _order(moves, ttMove, ply) {
+    const n = moves.length;
+    if (n < 2) return moves;
+    const killer1 = this.useKillers && ply >= 0 && ply < MAX_PLY ? this.killers[ply * 2] : 0;
+    const killer2 = this.useKillers && ply >= 0 && ply < MAX_PLY ? this.killers[ply * 2 + 1] : 0;
+    const side = this.board.sideToMove === 'w' ? 0 : 4096;
+    const scored = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const move = moves[i];
+      const code = encodeMove(move);
+      let s;
+      if (ttMove && code === ttMove) s = ORDER_HASH;
+      else if (move.pieceCaptured !== '.' || move.promotionPiece !== '.') s = ORDER_NOISY + noisyScore(move);
+      else if (code === killer1) s = ORDER_KILLER_1;
+      else if (code === killer2) s = ORDER_KILLER_2;
+      else s = this.useHistory ? this.history[side + move.startSq * 64 + move.targetSq] : 0;
+      scored[i] = { move, s };
+    }
+    scored.sort((a, b) => b.s - a.s);
+    for (let i = 0; i < n; i++) scored[i] = scored[i].move;
+    return scored;
+  }
+
+  // A quiet move that refuted a position is likely to refute its siblings
+  // (killer) and positions elsewhere in the tree (history). Captures and
+  // promotions are already ordered by what they win, so they are left out.
+  _rememberCutoff(move, ply, depth) {
+    if (move.pieceCaptured !== '.' || move.promotionPiece !== '.') return;
+    if (this.useKillers && ply < MAX_PLY) {
+      const code = encodeMove(move);
+      if (this.killers[ply * 2] !== code) {
+        this.killers[ply * 2 + 1] = this.killers[ply * 2];
+        this.killers[ply * 2] = code;
+      }
+    }
+    if (this.useHistory) {
+      const i = (this.board.sideToMove === 'w' ? 0 : 4096) + move.startSq * 64 + move.targetSq;
+      // Deep cutoffs save the most work, so they count the most.
+      this.history[i] += depth * depth;
+      if (this.history[i] > HISTORY_MAX) {
+        for (let j = 0; j < this.history.length; j++) this.history[j] >>= 1;
+      }
+    }
   }
 
   // Any knight, bishop, rook or queen for `color`.
@@ -229,8 +310,20 @@ export class SearchEngine {
   }
 }
 
-// Hash move first, then MVV-LVA captures, then promotions. `ttMove` is the
-// transposition table's packed best move, or 0.
+// MVV-LVA for a capture, plus a bonus for a promotion: 10 to 240.
+function noisyScore(move) {
+  let s = 0;
+  if (move.pieceCaptured !== '.') {
+    s += 100 + PIECE_ORDER[move.pieceCaptured] * 10 - PIECE_ORDER[move.pieceMoved];
+  }
+  if (move.promotionPiece !== '.') s += 50;
+  return s;
+}
+
+// Hash move first, then MVV-LVA captures, then promotions; quiet moves keep
+// generation order. Teaching mode's "MVV-LVA ordering" technique, kept exactly
+// as it was so its node counts stay comparable. `ttMove` is the transposition
+// table's packed best move, or 0.
 export function scoreMove(move, ttMove) {
   let s = 0;
   if (ttMove && encodeMove(move) === ttMove) s = 10000;

@@ -43,6 +43,29 @@ for (const nullMove of [true, false]) {
   });
 }
 
+test('a search with no time left still returns a move', () => {
+  for (const fen of ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1']) {
+    const board = boardFrom(fen);
+    const r = new SearchEngine(board, [board.positionKey()]).getBestMove(0);
+    assert.ok(r.bestMove, fen);
+    assert.equal(r.depth, 1);
+  }
+});
+
+test('killers and history change how many nodes a search takes, not what it finds', () => {
+  const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3';
+  const run = (options) => {
+    const board = boardFrom(fen);
+    return new SearchEngine(board, [board.positionKey()], options).getBestMove(60_000, null, { maxDepth: 5 });
+  };
+  const plain = run({ killers: false, history: false });
+  const ordered = run({});
+  assert.equal(ordered.bestMove.toUci(), plain.bestMove.toUci());
+  assert.equal(ordered.score, plain.score);
+  assert.ok(ordered.nodes < plain.nodes, `${ordered.nodes} vs ${plain.nodes}`);
+});
+
 // Win at Chess #1: 1.Qg6! gxf6 2.Qh7#. After 1.Qg6 Black's null move must not
 // hide the threat Qh7#, which a null search straight into quiescence cannot see.
 const WAC1 = '2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1';

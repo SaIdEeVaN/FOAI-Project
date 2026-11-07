@@ -1,0 +1,597 @@
+{
+ "depth": 7,
+ "engines": [
+  "base=foai@<engine before this iteration>",
+  "neither=foai:killers=false:history=false",
+  "killers=foai:history=false",
+  "history=foai:killers=false",
+  "both=foai"
+ ],
+ "labels": [
+  "base",
+  "neither",
+  "killers",
+  "history",
+  "both"
+ ],
+ "rows": [
+  {
+   "position": "Start position",
+   "phase": "opening",
+   "base": {
+    "nodes": 920884,
+    "ms": 4055,
+    "move": "b1c3",
+    "score": 28
+   },
+   "neither": {
+    "nodes": 920884,
+    "ms": 4058,
+    "move": "b1c3",
+    "score": 28
+   },
+   "killers": {
+    "nodes": 371495,
+    "ms": 1592,
+    "move": "b1c3",
+    "score": 28
+   },
+   "history": {
+    "nodes": 532150,
+    "ms": 2415,
+    "move": "b1c3",
+    "score": 28
+   },
+   "both": {
+    "nodes": 356261,
+    "ms": 1521,
+    "move": "b1c3",
+    "score": 28
+   }
+  },
+  {
+   "position": "Italian",
+   "phase": "opening",
+   "base": {
+    "nodes": 2179115,
+    "ms": 15204,
+    "move": "g8f6",
+    "score": 0
+   },
+   "neither": {
+    "nodes": 2179115,
+    "ms": 15493,
+    "move": "g8f6",
+    "score": 0
+   },
+   "killers": {
+    "nodes": 831398,
+    "ms": 5611,
+    "move": "g8f6",
+    "score": 0
+   },
+   "history": {
+    "nodes": 767532,
+    "ms": 5361,
+    "move": "g8f6",
+    "score": 0
+   },
+   "both": {
+    "nodes": 735237,
+    "ms": 4841,
+    "move": "g8f6",
+    "score": 0
+   }
+  },
+  {
+   "position": "Sicilian Najdorf",
+   "phase": "opening",
+   "base": {
+    "nodes": 4413212,
+    "ms": 28793,
+    "move": "d4f3",
+    "score": 98
+   },
+   "neither": {
+    "nodes": 4413212,
+    "ms": 28685,
+    "move": "d4f3",
+    "score": 98
+   },
+   "killers": {
+    "nodes": 1718929,
+    "ms": 9833,
+    "move": "d4f3",
+    "score": 98
+   },
+   "history": {
+    "nodes": 1833715,
+    "ms": 11680,
+    "move": "d4f3",
+    "score": 98
+   },
+   "both": {
+    "nodes": 1662083,
+    "ms": 9444,
+    "move": "d4f3",
+    "score": 98
+   }
+  },
+  {
+   "position": "Queen's Gambit Declined",
+   "phase": "opening",
+   "base": {
+    "nodes": 1935549,
+    "ms": 11691,
+    "move": "c4d5",
+    "score": -11
+   },
+   "neither": {
+    "nodes": 1935549,
+    "ms": 11551,
+    "move": "c4d5",
+    "score": -11
+   },
+   "killers": {
+    "nodes": 1372082,
+    "ms": 8183,
+    "move": "c4d5",
+    "score": -11
+   },
+   "history": {
+    "nodes": 1316168,
+    "ms": 7799,
+    "move": "c4d5",
+    "score": -11
+   },
+   "both": {
+    "nodes": 1307206,
+    "ms": 9031,
+    "move": "c4d5",
+    "score": -11
+   }
+  },
+  {
+   "position": "Kiwipete",
+   "phase": "middlegame",
+   "base": {
+    "nodes": 1906834,
+    "ms": 11288,
+    "move": "e2a6",
+    "score": 12
+   },
+   "neither": {
+    "nodes": 1906834,
+    "ms": 10036,
+    "move": "e2a6",
+    "score": 12
+   },
+   "killers": {
+    "nodes": 1898981,
+    "ms": 10039,
+    "move": "e2a6",
+    "score": 12
+   },
+   "history": {
+    "nodes": 1898913,
+    "ms": 9664,
+    "move": "e2a6",
+    "score": 12
+   },
+   "both": {
+    "nodes": 1897085,
+    "ms": 9648,
+    "move": "e2a6",
+    "score": 12
+   }
+  },
+  {
+   "position": "Perft position 4",
+   "phase": "middlegame",
+   "base": {
+    "nodes": 354383,
+    "ms": 1933,
+    "move": "c4c5",
+    "score": -458
+   },
+   "neither": {
+    "nodes": 354383,
+    "ms": 2018,
+    "move": "c4c5",
+    "score": -458
+   },
+   "killers": {
+    "nodes": 347090,
+    "ms": 1806,
+    "move": "c4c5",
+    "score": -458
+   },
+   "history": {
+    "nodes": 347552,
+    "ms": 1941,
+    "move": "c4c5",
+    "score": -458
+   },
+   "both": {
+    "nodes": 348905,
+    "ms": 1759,
+    "move": "c4c5",
+    "score": -458
+   }
+  },
+  {
+   "position": "Perft position 5",
+   "phase": "middlegame",
+   "base": {
+    "nodes": 466530,
+    "ms": 2619,
+    "move": "d7c8q",
+    "score": 531
+   },
+   "neither": {
+    "nodes": 466530,
+    "ms": 2567,
+    "move": "d7c8q",
+    "score": 531
+   },
+   "killers": {
+    "nodes": 434900,
+    "ms": 2315,
+    "move": "d7c8q",
+    "score": 531
+   },
+   "history": {
+    "nodes": 419115,
+    "ms": 2166,
+    "move": "d7c8q",
+    "score": 531
+   },
+   "both": {
+    "nodes": 429779,
+    "ms": 2162,
+    "move": "d7c8q",
+    "score": 531
+   }
+  },
+  {
+   "position": "Perft position 6",
+   "phase": "middlegame",
+   "base": {
+    "nodes": 1573677,
+    "ms": 10558,
+    "move": "c3d5",
+    "score": 109
+   },
+   "neither": {
+    "nodes": 1573677,
+    "ms": 10085,
+    "move": "c3d5",
+    "score": 109
+   },
+   "killers": {
+    "nodes": 1036644,
+    "ms": 5653,
+    "move": "c3d5",
+    "score": 109
+   },
+   "history": {
+    "nodes": 1180513,
+    "ms": 6854,
+    "move": "c3d5",
+    "score": 109
+   },
+   "both": {
+    "nodes": 1026102,
+    "ms": 5675,
+    "move": "c3d5",
+    "score": 109
+   }
+  },
+  {
+   "position": "Opera Game, mate in 2",
+   "phase": "tactic",
+   "base": {
+    "nodes": 11927,
+    "ms": 86,
+    "move": "b3b8",
+    "score": 19997
+   },
+   "neither": {
+    "nodes": 11927,
+    "ms": 82,
+    "move": "b3b8",
+    "score": 19997
+   },
+   "killers": {
+    "nodes": 11735,
+    "ms": 87,
+    "move": "b3b8",
+    "score": 19997
+   },
+   "history": {
+    "nodes": 11788,
+    "ms": 95,
+    "move": "b3b8",
+    "score": 19997
+   },
+   "both": {
+    "nodes": 11708,
+    "ms": 82,
+    "move": "b3b8",
+    "score": 19997
+   }
+  },
+  {
+   "position": "Win at Chess #1",
+   "phase": "tactic",
+   "base": {
+    "nodes": 34836,
+    "ms": 247,
+    "move": "g3g6",
+    "score": 19997
+   },
+   "neither": {
+    "nodes": 34836,
+    "ms": 292,
+    "move": "g3g6",
+    "score": 19997
+   },
+   "killers": {
+    "nodes": 33157,
+    "ms": 238,
+    "move": "g3g6",
+    "score": 19997
+   },
+   "history": {
+    "nodes": 33087,
+    "ms": 237,
+    "move": "g3g6",
+    "score": 19997
+   },
+   "both": {
+    "nodes": 33076,
+    "ms": 257,
+    "move": "g3g6",
+    "score": 19997
+   }
+  },
+  {
+   "position": "Win at Chess #4",
+   "phase": "tactic",
+   "base": {
+    "nodes": 11013,
+    "ms": 96,
+    "move": "h6h7",
+    "score": 19997
+   },
+   "neither": {
+    "nodes": 11013,
+    "ms": 87,
+    "move": "h6h7",
+    "score": 19997
+   },
+   "killers": {
+    "nodes": 11013,
+    "ms": 85,
+    "move": "h6h7",
+    "score": 19997
+   },
+   "history": {
+    "nodes": 11012,
+    "ms": 90,
+    "move": "h6h7",
+    "score": 19997
+   },
+   "both": {
+    "nodes": 11012,
+    "ms": 95,
+    "move": "h6h7",
+    "score": 19997
+   }
+  },
+  {
+   "position": "Suite FOAI-T.082 (Nd6)",
+   "phase": "tactic",
+   "base": {
+    "nodes": 143977,
+    "ms": 879,
+    "move": "b5d6",
+    "score": 255
+   },
+   "neither": {
+    "nodes": 143977,
+    "ms": 776,
+    "move": "b5d6",
+    "score": 255
+   },
+   "killers": {
+    "nodes": 145710,
+    "ms": 761,
+    "move": "b5d6",
+    "score": 255
+   },
+   "history": {
+    "nodes": 146010,
+    "ms": 827,
+    "move": "b5d6",
+    "score": 255
+   },
+   "both": {
+    "nodes": 145838,
+    "ms": 741,
+    "move": "b5d6",
+    "score": 255
+   }
+  },
+  {
+   "position": "Suite FOAI-T.085 (Bh3)",
+   "phase": "tactic",
+   "base": {
+    "nodes": 157218,
+    "ms": 807,
+    "move": "g4h3",
+    "score": 192
+   },
+   "neither": {
+    "nodes": 157218,
+    "ms": 806,
+    "move": "g4h3",
+    "score": 192
+   },
+   "killers": {
+    "nodes": 137944,
+    "ms": 690,
+    "move": "g4h3",
+    "score": 192
+   },
+   "history": {
+    "nodes": 130672,
+    "ms": 646,
+    "move": "g4h3",
+    "score": 192
+   },
+   "both": {
+    "nodes": 127350,
+    "ms": 626,
+    "move": "g4h3",
+    "score": 192
+   }
+  },
+  {
+   "position": "Rook endgame (perft 3)",
+   "phase": "endgame",
+   "base": {
+    "nodes": 46450,
+    "ms": 210,
+    "move": "b4f4",
+    "score": 35
+   },
+   "neither": {
+    "nodes": 46450,
+    "ms": 196,
+    "move": "b4f4",
+    "score": 35
+   },
+   "killers": {
+    "nodes": 37079,
+    "ms": 139,
+    "move": "b4f4",
+    "score": 35
+   },
+   "history": {
+    "nodes": 36987,
+    "ms": 145,
+    "move": "b4f4",
+    "score": 35
+   },
+   "both": {
+    "nodes": 36959,
+    "ms": 139,
+    "move": "b4f4",
+    "score": 35
+   }
+  },
+  {
+   "position": "Fine #70 (pawn endgame)",
+   "phase": "endgame",
+   "base": {
+    "nodes": 1317,
+    "ms": 5,
+    "move": "a1a2",
+    "score": 75
+   },
+   "neither": {
+    "nodes": 1317,
+    "ms": 8,
+    "move": "a1a2",
+    "score": 75
+   },
+   "killers": {
+    "nodes": 1355,
+    "ms": 5,
+    "move": "a1a2",
+    "score": 75
+   },
+   "history": {
+    "nodes": 1379,
+    "ms": 5,
+    "move": "a1a2",
+    "score": 75
+   },
+   "both": {
+    "nodes": 1338,
+    "ms": 5,
+    "move": "a1a2",
+    "score": 75
+   }
+  },
+  {
+   "position": "King and pawn",
+   "phase": "endgame",
+   "base": {
+    "nodes": 7674,
+    "ms": 19,
+    "move": "c4d3",
+    "score": 130
+   },
+   "neither": {
+    "nodes": 7674,
+    "ms": 19,
+    "move": "c4d3",
+    "score": 130
+   },
+   "killers": {
+    "nodes": 7220,
+    "ms": 19,
+    "move": "c4d3",
+    "score": 130
+   },
+   "history": {
+    "nodes": 7636,
+    "ms": 20,
+    "move": "c4d3",
+    "score": 130
+   },
+   "both": {
+    "nodes": 6894,
+    "ms": 18,
+    "move": "c4d3",
+    "score": 130
+   }
+  },
+  {
+   "position": "Queen vs rook",
+   "phase": "endgame",
+   "base": {
+    "nodes": 37677,
+    "ms": 83,
+    "move": "c1e3",
+    "score": 940
+   },
+   "neither": {
+    "nodes": 37677,
+    "ms": 85,
+    "move": "c1e3",
+    "score": 940
+   },
+   "killers": {
+    "nodes": 37538,
+    "ms": 84,
+    "move": "c1e3",
+    "score": 940
+   },
+   "history": {
+    "nodes": 34798,
+    "ms": 78,
+    "move": "c1e3",
+    "score": 940
+   },
+   "both": {
+    "nodes": 35572,
+    "ms": 81,
+    "move": "c1e3",
+    "score": 940
+   }
+  }
+ ]
+}
