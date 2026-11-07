@@ -21,9 +21,13 @@
 // rule or insufficient material, exactly as in the app, or is called a draw
 // after --max-plies (default 300). Results go to --out as JSON, and the games
 // to --pgn for replaying in any chess program.
+//
+// With --log <file>, every game is appended to the file as it finishes, and a
+// run started again with the same --log skips the games already in it, so a
+// long benchmark that is interrupted resumes where it stopped.
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { availableParallelism } from 'node:os';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { Board, hasThreefoldRepetition } from '../src/engine/board.js';
@@ -270,6 +274,7 @@ if (isMainThread && process.argv[1] === fileURLToPath(import.meta.url)) {
   const workers = Number(arg('workers', Math.max(1, availableParallelism() - 1)));
   const out = arg('out', null);
   const pgn = arg('pgn', null);
+  const log = arg('log', null);
 
   const jobs = [];
   for (const opponent of opponents) {
@@ -278,17 +283,27 @@ if (isMainThread && process.argv[1] === fileURLToPath(import.meta.url)) {
       for (const playerWhite of [true, false]) jobs.push({ opponent, openingName: name, opening: openingMoves(line), playerWhite });
     }
   }
+  // Games already in the log are not played again.
+  const jobKey = (j) => `${j.opponent}|${j.openingName}|${j.playerWhite}`;
+  const logged = log && existsSync(log)
+    ? readFileSync(log, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)).filter(g => jobs.some(j => jobKey(j) === jobKey(g)))
+    : [];
+  const loggedKeys = new Set(logged.map(jobKey));
+  const todo = jobs.filter(j => !loggedKeys.has(jobKey(j)));
+  if (logged.length) console.error(`${logged.length} games already in ${log}; playing the other ${todo.length}`);
+
   // Deal the games round-robin so every thread gets a similar mix.
-  const shards = Array.from({ length: workers }, (_, w) => jobs.filter((_, i) => i % workers === w));
+  const shards = Array.from({ length: workers }, (_, w) => todo.filter((_, i) => i % workers === w));
 
   const started = Date.now();
-  const games = [];
+  const games = [...logged];
   await Promise.all(shards.filter(s => s.length).map(shard => new Promise((done, fail) => {
     const w = new Worker(fileURLToPath(import.meta.url), {
       workerData: { player, jobs: shard, movetime, maxPlies, argv: process.argv },
     });
     w.on('message', (g) => {
       games.push(g);
+      if (log) appendFileSync(log, `${JSON.stringify(g)}\n`);
       const won = g.result === '1/2-1/2' ? '½' : ((g.result === '1-0') === g.playerWhite ? '1' : '0');
       console.error(`[${games.length}/${jobs.length}] vs ${g.opponent.padEnd(8)} ${g.playerWhite ? 'W' : 'B'} ${won}  ${g.reason.padEnd(21)} ${String(g.plies).padStart(3)} plies  ${g.openingName}`);
     });
