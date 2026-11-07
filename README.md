@@ -4,8 +4,12 @@ A browser-based chess game built with **React + Vite** as part of the *Foundatio
 
 The AI opponent runs entirely in the browser using a custom chess engine with:
 - **Minimax** search with **Alpha-Beta pruning**
-- **MVV-LVA move ordering** and a **fixed-size, Zobrist-hashed transposition table**
+- **Move ordering** — hash move, MVV-LVA captures, then **killer moves** and the **history heuristic** for quiet moves
+- A **fixed-size, Zobrist-hashed transposition table**
 - **Null-move pruning** and a configurable **contempt** for draws
+- A **tapered evaluation** (middlegame and endgame weights blended by game phase) whose 44 scalar
+  weights were **learned from the engine's own games by Texel tuning** — logistic regression on game
+  results; the piece-square tables are hand-set
 - **Iterative Deepening** for time-controlled play
 - A Web Worker so the UI stays responsive while the engine thinks
 
@@ -31,7 +35,7 @@ The final report, with the experiments and the playing-strength benchmark, is in
 | Engine telemetry | Depth, nodes searched, best move log (in SAN), and how full the transposition table is |
 | Move history | Full game record in Standard Algebraic Notation |
 | Undo | Take back the last pair of moves |
-| Teaching mode | Searches the current position — or any position you paste as FEN, or one of five sharp presets — three ways at a fixed depth and compares node counts |
+| Teaching mode | Searches the current position — or any position you paste as FEN, or one of five sharp presets — three ways at a fixed depth and compares node counts, beside a term-by-term breakdown of the evaluation and the game phase it was blended at |
 
 ---
 
@@ -46,12 +50,12 @@ Measured on the starting position (Node 22, one core):
 
 | Configuration | Nodes | Time | Relative |
 |---|---|---|---|
-| Plain Minimax | 5,072,213 | 15.0s | baseline |
-| + Alpha-Beta | 113,360 | 0.42s | 45× fewer |
-| + MVV-LVA + TT | 58,390 | 0.28s | 87× fewer |
+| Plain Minimax | 5,072,213 | 12.3s | baseline |
+| + Alpha-Beta | 131,362 | 0.38s | 39× fewer |
+| + MVV-LVA + TT | 72,110 | 0.24s | 70× fewer |
 
-Fewer nodes is not automatically less time: sorting the moves costs about 40% of the speed per
-node. It pays anyway, because it saves far more nodes than that. [`REPORT.md`](REPORT.md) repeats this comparison over 17 positions and depths 1–7.
+Fewer nodes is not automatically less time: sorting the moves costs some speed per node (about 13%
+here). It pays anyway, because it saves far more nodes than that. [`REPORT.md`](REPORT.md) repeats this comparison over 17 positions and depths 1–7.
 
 The plain node count is exactly `perft(0) + … + perft(5)`, which is a useful correctness check on
 the move generator. Searches run one at a time in a dedicated Web Worker, and each result appears
@@ -87,7 +91,7 @@ pawns in particular — were painted black by the OS on the machines that shippe
 
 - **React 19** + **Vite 8**
 - Vanilla CSS (no UI library)
-- Custom chess engine (TypeScript compiled to JS)
+- Custom chess engine in plain JavaScript (ES modules), shared by the site and the Node benchmarks
 - Web Workers for off-thread engine search
 - Firebase Hosting for deployment
 
@@ -127,9 +131,9 @@ installed for the run (it is ~100 MB, so it is not a dependency):
 npm install --no-save stockfish
 
 # Elo estimate: fixed time per move against Stockfish at calibrated strengths
-node bench/match.js --player foai --opponents sf:1500,sf:1700,sf:1900,sf:2100 --movetime 1000 --rounds 16
+node bench/match.js --player foai --opponents sf:1700,sf:1900,sf:2100,sf:2300 --movetime 1000 --rounds 16
 
-# Self-play A/B, e.g. null-move on vs off
+# Self-play A/B, e.g. null-move on vs off (add --log games.jsonl to make a long run resumable)
 node bench/match.js --player foai --opponents foai:nullMove=false --movetime 300
 
 # Teaching-search experiments over 17 positions and depths 1–7, then the report tables
@@ -139,6 +143,16 @@ node bench/tables.js
 # The 105-position tactical suite, and transposition-table sizing
 node bench/suite.js --engine foai --movetime 1000
 node bench/tt-size.js
+
+# Game-search nodes to a fixed depth, e.g. what killer moves and history save
+node bench/nodes.js --depth 7 --engines none=foai:killers=false:history=false,both=foai
+
+# Texel tuning: self-play positions labelled with their game's result, then the fit
+node bench/datagen.js --minutes 100 --movetime 40          # → bench/data/selfplay.txt (not committed)
+node bench/tune.js --epochs 1000 --write \
+  --only pieceValue,doubled,isolated,passed,bishopPair,rookOpen,rookSemiOpen,kingFileOpen,kingFileBare,kingShield,mobility
+                                                           # → src/engine/weights.js (the shipped fit)
+node bench/weights-file.js --hand                          # back to the hand-set weights
 ```
 
 Results, games (PGN) and the tactical suite are in `bench/results/` and `bench/positions/`;
@@ -166,8 +180,10 @@ chess_react/
 │   │   ├── move.js             # Move encoding/decoding
 │   │   ├── san.js              # SAN: writing moves, and reading typed ones
 │   │   ├── fen.js              # FEN validation with plain-language errors
-│   │   ├── evaluation.js       # Static evaluation + per-term breakdown
-│   │   ├── search.js           # Iterative deepening, null-move, contempt (game play)
+│   │   ├── evaluation.js       # Tapered evaluation, per-term breakdown, features for the tuner
+│   │   ├── evalLayout.js       # The evaluation's parameters, in the order the tuner fits them
+│   │   ├── weights.js          # The evaluation weights (scalars learned by bench/tune.js)
+│   │   ├── search.js           # Iterative deepening, killers/history, null-move, contempt (game play)
 │   │   ├── teachingSearch.js   # Fixed-depth search with switchable techniques
 │   │   ├── transposition.js    # Zobrist hashing + fixed-size transposition table
 │   │   ├── premove.js          # Premove target squares
@@ -176,7 +192,7 @@ chess_react/
 │   ├── index.css               # Design tokens, shared primitives, both screens
 │   └── main.jsx                # React entry point
 ├── test/                       # npm test — node:test suite
-├── bench/                      # Matches, Elo, experiments, tactical suite (Node only)
+├── bench/                      # Matches, Elo, experiments, tactical suite, Texel tuning (Node only)
 │   ├── positions/tactics.epd   # 105 Stockfish-verified positions with one best move
 │   └── results/                # Raw results behind REPORT.md
 ├── public/
@@ -190,7 +206,8 @@ chess_react/
 
 ## Deployment
 
-See the **Firebase + GitHub Actions CI/CD guide** in `DEPLOY_GUIDE.md` for step-by-step hosting and automation instructions.
+Every push to `main` runs `.github/workflows/deploy.yml`: `npm ci`, `npm test`, `npm run build`, then
+`firebase deploy --only hosting` to the `foai-chess-engine` project. A failing test stops the deploy.
 
 ---
 

@@ -6,8 +6,8 @@
 | **Course** | Foundations of Artificial Intelligence |
 | **Repository** | [SaIdEeVaN/FOAI-Project](https://github.com/SaIdEeVaN/FOAI-Project) |
 | **Live** | Firebase Hosting, project `foai-chess-engine` |
-| **Status** | Milestones 1–12 delivered; §11 lists what is not built |
-| **Last updated** | 2026-09-25 |
+| **Status** | Milestones 1–15 delivered; §11 lists what is not built |
+| **Last updated** | 2026-11-07 |
 
 > **About this document.** The product was built before this PRD was written down, so it
 > records the requirements the implementation actually meets rather than a forward plan.
@@ -111,10 +111,10 @@ external GUIs.
 |---|---|
 | Algorithm | Negamax with alpha-beta |
 | Iterative deepening | Depth 1 upward, hard ceiling of 12 |
-| Time budget (play) | 2,000 ms, checked every 2,048 nodes |
+| Time budget (play) | 2,000 ms, checked every 2,048 nodes; depth 1 always completes, so a move is returned even with no time left |
 | Early exit | Stops on a forced mate (score magnitude > 15,000) |
 | Quiescence | Captures only, at the leaves, to blunt the horizon effect |
-| Move ordering | Hash move first, then MVV-LVA captures, then promotions |
+| Move ordering | Hash move, then captures and promotions by MVV-LVA, then two killer moves per ply, then the other quiet moves by history score (`history[side][from][to]`, +depth² per cutoff, halved past 60,000) |
 | Null-move pruning | R = 2, at nodes with at least 4 plies left (§7.6); not in check, not twice in a row, not near mate scores, not with only king and pawns |
 | Draws in the tree | Repetition (§7.4), stalemate and the fifty-move rule, each scored with contempt |
 | Contempt | A draw is worth −contempt to the engine and +contempt to its opponent |
@@ -143,13 +143,23 @@ since both alter what a draw is worth.
 Centipawns, always from White's perspective. `evaluate()` and the teaching-mode `breakdown()`
 share one code path, so the number on the bar and the number in the breakdown cannot disagree.
 
-| Term | Rule |
+**Tapered.** Every weight has a middlegame (mg) and an endgame (eg) value, blended by the game
+phase — knight and bishop 1, rook 2, queen 4; 24 at the start, 0 with kings and pawns — as
+`(mg·phase + eg·(24 − phase)) / 24`. Each of the five terms is rounded towards zero on its own, so
+the breakdown adds up exactly and a colour-flipped position scores exactly the negative.
+
+| Term | Rule, mg / eg (weights in `src/engine/weights.js`) |
 |---|---|
-| Material | P 100, N 320, B 330, R 500, Q 900, K 20,000 |
-| Piece-square | Per-piece table, mirrored for Black |
-| Pawn structure | −15 per doubled pawn, −20 per isolated pawn |
-| King safety | −30 on an open file, a further −20 if open for the opponent too; +10 per pawn in the shield when the king is castled wide of the centre |
-| Mobility | Knight and bishop mobility, weighted ×2; knight counts come from a precomputed per-square table |
+| Material | P 103 / 130, N 294 / 283, B 298 / 297, R 443 / 466, Q 950 / 952; bishop pair 15 / 19 |
+| Piece-square | Per-piece tables, mirrored top to bottom for Black (`sq ^ 56`) |
+| Pawn structure | Doubled −13 / −20 and isolated −1 / −15 per pawn; passed pawns by rank, rising to 179 on the seventh in the endgame |
+| King safety | No friendly pawn on the king's file −10 / +43, no pawn at all a further −58 / −49; +12 / −18 per shield pawn when the king is castled wide of the centre |
+| Mobility | Per square a piece can move to: knight −2 / −1, bishop 4 / 2, rook 1 / 8; rook on an open file 39 / −9, half-open 19 / 23 |
+
+The 44 scalar weights in this table were fitted to self-play game results by Texel tuning
+(`bench/tune.js`; `REPORT.md` §8). The piece-square tables are hand-set: the games available
+(3,941) could not pin down 768 entries without overfitting. `Evaluation.features()` exposes a
+position as the tuner sees it, and a test checks it reproduces `evaluate()`.
 
 ### 7.4 Repetition identity
 
@@ -232,22 +242,38 @@ Starting position, fixed depth 5, one core:
 
 | Configuration | Nodes | Time | Relative to baseline |
 |---|---|---|---|
-| Plain minimax | 5,072,213 | 15.0 s | baseline |
-| + Alpha-beta | 113,360 | 0.42 s | 45× fewer |
-| + MVV-LVA + TT | 58,390 | 0.28 s | 87× fewer |
+| Plain minimax | 5,072,213 | 12.3 s | baseline |
+| + Alpha-beta | 131,362 | 0.38 s | 39× fewer |
+| + MVV-LVA + TT | 72,110 | 0.24 s | 70× fewer |
 
 - The plain node count is exactly the cumulative perft, which is what makes it a correctness
   check on the move generator rather than just a performance number.
-- Fewer nodes is not automatically less time: move ordering costs about 40% of the speed per
-  node, and is still by far the best trade.
+- Fewer nodes is not automatically less time: move ordering costs some speed per node (about 13%
+  here), and is still by far the best trade. (The pruned counts depend on the evaluation, so they
+  moved when it changed in November; the plain count cannot.)
 - Over 17 positions, alpha-beta, ordering and the table return exactly plain minimax's score
   and move in all 79 searches minimax could finish; at depth 4 they cut its nodes about 110×
   (geometric mean).
 - **Null-move pruning** is worth about +130 Elo in self-play (80 games, 68%); the 4-ply guard
   (§7.6) costs nothing measurable against the 3-ply one (−30 Elo, 95% interval −100 to +37).
-- **Playing strength:** about 1600–1700 on Stockfish 19's `UCI_Elo` scale at 1 s per move
+- **Playing strength (September):** about 1600–1700 on Stockfish 19's `UCI_Elo` scale at 1 s per move
   (pooled estimate 1697 ± 72 over 128 games; 1600 ± 89 from the two anchors that bracket it).
   `REPORT.md` §5 explains why a range is the honest answer.
+
+**November 2026** (`REPORT.md` §6–9; all self-play at 300 ms a move, 80 games):
+
+- **Killer moves and history:** 42% fewer nodes to depth 7 over 17 positions, same best move in all
+  17; +44 Elo (95% interval −21 to +111).
+- **Tapered evaluation**, hand-set: +248 Elo (+169 to +357) against the engine with killers and
+  history, at 12% fewer nodes per second.
+- **Texel tuning:** 3,941 self-play games, 257,691 positions. Fitting the 44 scalar weights lowers
+  the held-out prediction error from 0.14098 to 0.13946; fitting all ~800 overfits. Learned against
+  hand-set weights: +80 Elo (+11 to +155).
+- **Final against the September engine:** +53 =12 −15 (73.8%), +179 Elo (+108 to +268); tactical
+  suite at 1 s, 94/105 against 88/105.
+- **Playing strength (November):** about 1900–2000 on Stockfish 19's `UCI_Elo` scale at 1 s per
+  move (pooled 2015 ± 71 over 128 games; 1982 ± 89 from the two anchors that bracket it). On the
+  three anchors both engines played, 1730 → 1922: +192, in line with the direct match.
 
 **Cost of repetition awareness.** Tracking positions through the search costs 2–5% of search
 speed (97.6k to 95.2k nodes/second on the start position, 103.3k to 98.1k on an Italian
@@ -273,7 +299,9 @@ Browser (no backend)
     ├── search.js          iterative deepening, for game play
     ├── teachingSearch.js  fixed depth, every technique switchable
     ├── moveGen.js         legal move generation
-    ├── evaluation.js      static evaluation + per-term breakdown
+    ├── evaluation.js      tapered evaluation, per-term breakdown, features for tuning
+    ├── evalLayout.js      the evaluation's parameters, in the tuner's order
+    ├── weights.js         evaluation weights (scalars learned by bench/tune.js)
     ├── transposition.js   Zobrist hashing + fixed-size TT
     ├── board.js           board state, FEN in and out, make/unmake
     ├── fen.js             FEN validation with plain-language errors
@@ -282,7 +310,8 @@ Browser (no backend)
 
 test/                      node --test suite: perft, FEN, SAN, search, TT, teaching
 bench/                     Node scripts, not shipped: matches and Elo, experiments,
-                           tactical suite, TT sizing; results in bench/results/
+                           tactical suite, TT sizing, fixed-depth node counts, self-play
+                           data and Texel tuning; results in bench/results/
 ```
 
 The worker accepts three messages — `search`, `teach` and `legalMoves` — and streams progress
@@ -299,8 +328,8 @@ applied falls back to SVG's initial value, which is black. Colour now depends on
 can fail to load.
 
 **Deployment.** Push to `main` triggers GitHub Actions: `npm ci`, `npm test`, `npm run build`,
-then `firebase deploy --only hosting`. Production bundle is roughly 353 KB of JS (112 KB gzipped),
-14 KB of CSS and an 18 KB worker.
+then `firebase deploy --only hosting`. Production bundle is roughly 379 KB of JS (121 KB gzipped),
+18 KB of CSS and a 29 KB worker.
 
 ---
 
@@ -310,7 +339,9 @@ then `firebase deploy --only hosting`. Production bundle is roughly 353 KB of JS
 |---|---|---|
 | The search scores the *first* repetition as a draw | Inside the tree a position seen twice is treated as drawn, which is one occurrence short of the actual rule | Deliberate, and what engines normally do: waiting for a literal third occurrence would hide forced repetitions. The game layer still requires a true threefold before declaring the draw |
 | Quiescence ignores checks | A leaf in check is scored by standing pat, and a quiet mate at the horizon is invisible | The reason null-move needs 4 plies left (§7.6). Searching check evasions in quiescence would close it |
-| No check extension, killer moves or history heuristic | Quiet moves are searched in generation order; forcing lines are not deepened | Each is a standard next step; the test suite and match runner are there to measure them |
+| No check extension | Forcing lines are not deepened | The standard next step; `bench/nodes.js` and the match runner are there to measure it |
+| Piece-square tables are hand-set | Only the 44 scalar weights are learned | 3,941 self-play games were not enough for 768 more entries (`REPORT.md` §8.3); more games, ideally at a longer time control, are the next step |
+| The training games are the engine's own | The weights fit the positions this engine reaches and the mistakes it makes | A second round — new games with the tuned weights, then retuning — would show whether the gain compounds |
 | Transposition table entries depend on the path | A draw score stored because a line repeated can be reused where it did not | Accepted by most engines; the table is cleared when contempt or the engine's side changes |
 | Contempt applies to draws the search can see | Insufficient material is not recognised inside the tree | The game layer still declares it |
 | No opening book | The engine searches from move one | Deliberate — out of scope per §4 |
@@ -334,6 +365,9 @@ then `firebase deploy --only hosting`. Production bundle is roughly 353 KB of JS
 | 10 | Null-move pruning in the game search, contempt, fixed-size transposition table | Delivered |
 | 11 | Automated test suite with perft on the standard positions; CI gate | Delivered |
 | 12 | Playing-strength benchmark and extended experiments; final report | Delivered |
+| 13 | Killer moves and the history heuristic in the game search | Delivered |
+| 14 | Tapered evaluation: middlegame and endgame weights; passed pawns, bishop pair, rooks on open files, real mobility | Delivered |
+| 15 | Texel tuning: self-play data generator, tuner, learned weights | Delivered |
 
 ---
 

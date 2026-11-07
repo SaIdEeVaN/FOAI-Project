@@ -1,14 +1,37 @@
 # FOAI Chess Engine — Final Report
 
-*Foundations of Artificial Intelligence · course project · September 2026*
+*Foundations of Artificial Intelligence · course project · September 2026, extended November 2026*
 
 This report evaluates the engine behind the FOAI Chess Engine site: how correct it is, what each
 search technique buys, what the final round of engine work changed, and how strong the result
-plays. Every number here was measured for this report on one core of the same machine (Node 22,
-Linux, 4 cores), and every script and raw result needed to reproduce it is in the repository
-(§8).
+plays. Sections 6–9 were added in November 2026 for a further round: move ordering for quiet
+moves, a tapered evaluation, and Texel tuning — the evaluation's weights learned from the engine's
+own games, which is the project's machine-learning component. Every number here was measured for
+this report on the same kind of machine (Node 22, Linux, 4 cores), and every script and raw result
+needed to reproduce it is in the repository (§12).
 
 ## Summary
+
+**November 2026** (§6–9):
+
+- **Killer moves and the history heuristic** cut the nodes the game search needs to reach depth 7
+  by 42% over 17 positions, with the same best move in every one. +44 Elo in self-play, too few
+  games to tell from zero.
+- **A tapered evaluation** — middlegame and endgame values blended by game phase, plus passed
+  pawns, the bishop pair, rooks on open files and true mobility — is the largest gain: **+248 Elo**,
+  although it costs 12% of search speed.
+- **Texel tuning** fitted the evaluation to 257,691 positions from 3,941 self-play games by
+  logistic regression. Fitting all ~800 weights overfits this much data; fitting the 44 scalar
+  weights generalises best (held-out prediction error −1.1%) and wins **+80 Elo** against the
+  hand-set weights (95% interval +11 to +155).
+- **Altogether +179 Elo** against the September engine (80 games, 73.8%), and 94 tactical
+  positions solved at 1 second instead of 88. On Stockfish 19's limited-strength scale at 1 s a
+  move, **about 1900–2000** (pooled 2015 ± 71 over 128 games): +192 over the September engine on
+  the three settings both played.
+- One bug found on the way: a search that ran out of time inside depth 1 returned no move. Depth 1
+  now always completes.
+
+**September 2026** (§1–5; §1 describes the current engine, §2–5 the engine as it was then):
 
 - **Correct.** Move generation matches the published perft counts on all seven standard
   positions, 17.0 million leaves in all. 53 automated tests run on every build and gate the deploy.
@@ -36,14 +59,14 @@ A classical search engine written from scratch in JavaScript, running in a Web W
 | Part | What it does |
 |---|---|
 | Board and moves | 64-square array, make/unmake, legal move generation, FEN in and out, SAN in and out |
-| Evaluation | Material, piece-square tables, pawn structure, king safety, mobility — in centipawns from White's side |
-| Search | Negamax with alpha-beta, iterative deepening to a time budget, captures-only quiescence, MVV-LVA ordering with the hash move first |
+| Evaluation | Tapered (§7): material, piece-square tables, pawn structure with passed pawns, king safety, mobility, rooks on open files and the bishop pair, each with a middlegame and an endgame weight blended by game phase; the scalar weights learned by Texel tuning (§8). Centipawns, from White's side |
+| Search | Negamax with alpha-beta, iterative deepening to a time budget, captures-only quiescence; ordering by hash move, MVV-LVA captures, then killer moves and the history heuristic (§6) |
 | Transposition table | 64-bit Zobrist keys; fixed size (2^19 slots, ~10 MB); depth-preferred replacement with aging; kept for the whole game |
 | Null-move pruning | R = 2, only with at least 4 plies left, never in check, twice in a row, near mate or with only king and pawns |
 | Draws | Repetition (against the game's history and the current line), stalemate and the fifty-move rule, all scored with a configurable contempt |
 | Teaching search | A separate fixed-depth search in which every technique can be switched off, to measure what each one costs |
 
-What this final iteration added, against the plan in `future_implementations`:
+What the September iteration added, against the plan in `future_implementations` (§6–9 cover November):
 
 | Plan item | Delivered | Where |
 |---|---|---|
@@ -124,6 +147,11 @@ configuration stops going deeper on a position once one search passes 30 seconds
 reported as a lower bound (`≥`). Node counts are exact and deterministic; times are single-core.
 
 917 searches ran, 51 of which hit the 30-second limit.
+
+These runs used the September evaluation. Plain minimax visits every node whatever the evaluation
+says, so its counts are unchanged today; the pruned configurations' counts depend on the scores and
+would come out somewhat different with the evaluation of §7–8, but the comparisons this section
+draws between techniques do not depend on it.
 
 ### 3.2 How many nodes each configuration visits
 
@@ -519,29 +547,369 @@ ply more.
 
 ---
 
-## 6. Limitations and next steps
+## 6. Killer moves and the history heuristic
+
+§3 showed that move ordering is what turns alpha-beta's theoretical saving into a real one. Until
+this iteration, though, the game search ordered only the hash move, captures and promotions. Every
+quiet move — most moves in most positions — came in whatever order the generator produced. Two
+standard heuristics fill that gap, and both learn while the search runs:
+
+- **Killer moves.** The last two quiet moves that caused a beta cutoff at each ply. A move that
+  refuted one position is likely to refute its siblings, which differ only by the move just before.
+- **History heuristic.** A table `history[side][from][to]` that gains `depth²` every time a quiet
+  move causes a cutoff anywhere in the tree, so deep (expensive) refutations count for most. When an
+  entry passes 60,000 the whole table is halved, which keeps it below the killers and lets it forget.
+
+The order is now: hash move; captures and promotions by MVV-LVA; killer 1; killer 2; every other
+quiet move by its history score. Teaching mode's search is untouched: its "MVV-LVA ordering"
+technique is exactly what §3 measured.
+
+### 6.1 Nodes to a fixed depth
+
+`bench/nodes.js` searches §3's 17 positions to depth 7 with the game search (fresh table, no game
+history), so the counts are exact and repeatable. With both heuristics switched off, the new code
+searches **the same tree as the old one, node for node** (14,202,273 nodes in all), which shows the
+rewritten ordering changed nothing else.
+
+| Position | Before | Killers only | History only | Both | Both / before |
+|---|---:|---:|---:|---:|---:|
+| Start position | 920,884 | 371,495 | 532,150 | 356,261 | 0.39 |
+| Italian | 2,179,115 | 831,398 | 767,532 | 735,237 | 0.34 |
+| Sicilian Najdorf | 4,413,212 | 1,718,929 | 1,833,715 | 1,662,083 | 0.38 |
+| Queen's Gambit Declined | 1,935,549 | 1,372,082 | 1,316,168 | 1,307,206 | 0.68 |
+| Kiwipete | 1,906,834 | 1,898,981 | 1,898,913 | 1,897,085 | 0.99 |
+| Perft position 4 | 354,383 | 347,090 | 347,552 | 348,905 | 0.98 |
+| Perft position 5 | 466,530 | 434,900 | 419,115 | 429,779 | 0.92 |
+| Perft position 6 | 1,573,677 | 1,036,644 | 1,180,513 | 1,026,102 | 0.65 |
+| Opera Game, mate in 2 | 11,927 | 11,735 | 11,788 | 11,708 | 0.98 |
+| Win at Chess #1 | 34,836 | 33,157 | 33,087 | 33,076 | 0.95 |
+| Win at Chess #4 | 11,013 | 11,013 | 11,012 | 11,012 | 1.00 |
+| Suite FOAI-T.082 (Nd6) | 143,977 | 145,710 | 146,010 | 145,838 | 1.01 |
+| Suite FOAI-T.085 (Bh3) | 157,218 | 137,944 | 130,672 | 127,350 | 0.81 |
+| Rook endgame (perft 3) | 46,450 | 37,079 | 36,987 | 36,959 | 0.80 |
+| Fine #70 (pawn endgame) | 1,317 | 1,355 | 1,379 | 1,338 | 1.02 |
+| King and pawn | 7,674 | 7,220 | 7,636 | 6,894 | 0.90 |
+| Queen vs rook | 37,677 | 37,538 | 34,798 | 35,572 | 0.94 |
+| **All 17** | **14,202,273** | **8,434,270** | **8,709,027** | **8,172,405** | **0.58** |
+| Geometric mean of the ratio to before | | 0.78 | 0.80 | 0.76 | |
+
+- **42% fewer nodes overall, and the same best move in all 17 positions.** Each heuristic alone gets
+  most of the saving (22% and 20% by geometric mean); they overlap, so together they add only a
+  little more (24%).
+- **The saving is in quiet positions.** Three of the four openings need 61–66% fewer nodes (the
+  Queen's Gambit Declined 32%), and the quiet middlegame of perft position 6 35%. In
+  Kiwipete, Win at Chess #4 and the forced mates almost nothing changes: there the captures
+  and the hash move already decide the order, and quiet moves rarely matter.
+- **Nodes got no dearer.** Scores are now worked out once per move rather than inside the sort's
+  comparator; with both heuristics off that alone is 2% faster per node (160k → 163k per second), and
+  the smaller tree runs at 177k.
+
+### 6.2 In games
+
+80 games at 300 ms a move against the engine this iteration started from: **+34 =22 −24 (56.3%),
++44 Elo (95% interval −21 to +111)**, searching 7.05 plies deep on average. The direction is clear,
+but 80 games cannot tell +44 from zero; the node counts above are the firmer evidence.
+
+---
+
+## 7. A tapered evaluation
+
+The evaluation of §1 used one set of numbers for the whole game. Its king table, for instance,
+rewards a king tucked behind its pawns on g1 and punishes one on e4 by 70 centipawns. That is right
+with the queens on, and wrong in a king-and-pawn ending, where the king belongs in the centre. One
+table cannot be right in both.
+
+Every weight now has two values, one for the middlegame (mg) and one for the endgame (eg), and the
+evaluation blends them by the **game phase**: each knight or bishop counts 1, each rook 2 and each
+queen 4, so the phase is 24 at the start and 0 with only kings and pawns. A term contributes
+
+    (mg · phase + eg · (24 − phase)) / 24
+
+so it slides from one value to the other as pieces come off, with no abrupt switch at an arbitrary
+"endgame" threshold. Teaching mode's evaluation breakdown now shows the phase it blended at.
+
+The same pass added the patterns the old evaluation could not see:
+
+| Term | Counted as |
+|---|---|
+| Passed pawn | Per pawn with no enemy pawn ahead of it on its own or a neighbouring file, by how far it has advanced (6 values per phase) |
+| Bishop pair | Two or more bishops |
+| Rook on an open / half-open file | No pawns on the file / only enemy pawns |
+| Mobility | Per square a knight, bishop or rook can move to (empty, or holding an enemy piece) |
+
+Mobility changed meaning on the way. The old knight term counted the knight's squares from a fixed
+per-square table, which made it part of the knight's piece-square table under another name. It now
+counts the squares the knight can actually move to, and the same goes for bishops and the new rook
+term.
+
+Two implementation details matter for what follows:
+
+- **Black reads the tables mirrored, not rotated.** The old code looked up Black's square as
+  `63 − sq`, which flips the board top to bottom *and* left to right. That was harmless only because
+  every hand-written table was left-right symmetric. A fitted table need not be, so Black now uses
+  `sq ^ 56`, a pure top-to-bottom mirror. The colour-symmetry test, now also run on 300 random
+  positions, would catch the old form as soon as a table became asymmetric.
+- **Each term is rounded on its own**, towards zero, so the breakdown still adds up exactly to the
+  score and a colour-flipped position still scores exactly the negative.
+
+Before any tuning, the endgame values were set by hand: the same as the middlegame values except for
+a centralising king table, a larger passed-pawn bonus, and no king-shelter terms. The richer
+evaluation costs about 12% of search speed (169k → 148k nodes per second on five positions), and at
+300 ms a move the engine searched 6.4 plies on average instead of 7.05. **It is still the largest
+gain of this iteration: +61 =7 −12 (80.6%) against the engine of §6, +248 Elo (95% interval +169 to
++357).**
+
+---
+
+## 8. Texel tuning: learning the evaluation from games
+
+Every number in §7 was still chosen by hand. Texel tuning, named after Peter Österlund's engine
+Texel where it was introduced in 2014, replaces those guesses with values fitted to game results. It
+is the machine-learning part of this project, and a textbook case: a linear model, a logistic link,
+and a loss minimised by gradient descent.
+
+### 8.1 The model
+
+The evaluation is linear in its weights. For a position *i*, `Evaluation.features()` lists how often
+each pattern occurs, as White's count minus Black's — one knight more, a knight on f3, two doubled
+pawns fewer, eleven more squares of bishop mobility — and the score is
+
+    q_i = Σ_j φ_ij · (mg_j · phase_i + eg_j · (24 − phase_i)) / 24
+
+over ~800 weights (mg_j, eg_j). A score becomes a predicted result through the logistic curve chess
+programmers already use to relate centipawns to winning chances,
+
+    σ(q) = 1 / (1 + 10^(−K·q/400))
+
+and the weights minimise the mean squared error between that prediction and the result R_i of the
+game the position came from (1, ½ or 0, from White's side):
+
+    E = 1/N Σ_i (R_i − σ(q_i))²
+
+With the features fixed, this is logistic regression with a squared-error loss. K is fitted first,
+to the hand-set weights (K = 0.846), and then held fixed. That pins the scale, so a pawn stays worth
+about a hundred and contempt and the mate thresholds keep their meaning. A test checks that
+`features()` and the weights reproduce `evaluate()` on 407 positions to within the rounding of the
+five terms, so the tuner fits exactly the function the engine uses.
+
+### 8.2 The data
+
+As in Österlund's original, the training games are the engine's own (`bench/datagen.js`): the §7
+engine with hand-set weights, playing itself at 40 ms a move. Each game starts from one of the forty
+book openings followed by 2–8 random moves, so no two games are alike; openings the random moves
+left more than two pawns out of balance are discarded. A game is adjudicated as won once the score
+has stayed beyond ±10 pawns for 6 plies, and as drawn at 400 plies.
+
+Only **quiet** positions are kept — the side to move is not in check, and the move the engine chose
+is not a capture or a promotion — because a static evaluation cannot judge a position in the middle
+of an exchange. Positions where the search had already found a mate are dropped too.
+
+About 100 minutes on three cores produced **3,941 games and 257,691 positions**, 65 per game (White
+won 45% of the games, Black 45%, 10% were drawn), with 19.4 nonzero features each. Featurising all
+of them takes 3 seconds; an epoch over the training set then takes 40 ms.
+
+### 8.3 Fitting without fooling ourselves
+
+The first fit went wrong in an instructive way. Split at random by position, the held-out error fell
+almost as fast as the training error. But neighbouring positions of one game are near copies with the
+same result, so a random split tests the model on what it was trained on. Split **by game**, the
+held-out error rose from the first epoch: with a few hundred games and ~800 weights, the fit was
+memorising games.
+
+The final procedure:
+
+- **Whole games are held out**: every tenth game for validation, and another tenth as a test set.
+  The validation games choose the stopping epoch and the model; the test games are never used for
+  any choice, so their error is the honest measure.
+- **Early stopping**: full-batch Adam, keeping the weights with the lowest validation error.
+- **Piece-square tables tied left to right** (a-file with h-file, and so on), halving their
+  parameters.
+- After fitting, each piece-square table's average is moved into its piece's value. The fit cannot
+  tell the two apart — they only enter the score as a sum — so this changes no evaluation, and it
+  keeps the piece values meaning what they say.
+
+Three candidate models were compared on the validation games (mean squared error; the hand-set
+weights score 0.14290 on validation and 0.14098 on test):
+
+| Fitted | Weights fitted | Best epoch | Train | Validation | Test |
+|---|---:|---:|---:|---:|---:|
+| Nothing (hand-set) | 0 | — | 0.13837 | 0.14290 | 0.14098 |
+| Everything | ~800 | 25 | 0.13459 | 0.14083 | 0.13992 |
+| Everything but the piece-square tables, with L2 towards the hand-set values (λ = 10⁻⁶) | 44 | 25 | 0.13738 | 0.14196 | 0.14040 |
+| **Everything but the piece-square tables** | **44** | **125** | **0.13585** | **0.14048** | **0.13946** |
+
+The full model fits the training games best and the held-out games worse: its 768 piece-square
+entries give it room to memorise. Fitting the 44 scalar weights alone — piece values, pawn
+structure, king safety, mobility, rooks and the bishop pair, each with a middlegame and an endgame
+value — generalises best, and that is the model the engine ships with. It lowers the test error by
+1.1%. That sounds small, but it is measured on game results, which no evaluation can predict well
+from a single position.
+
+The learning curve of the chosen fit shows the overfitting that early stopping guards against:
+
+| Epoch | 0 | 25 | 50 | 125 | 250 | 500 | 1000 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Train | 0.13837 | 0.13699 | 0.13651 | 0.13584 | 0.13536 | 0.13488 | 0.13456 |
+| Validation | 0.14290 | 0.14135 | 0.14089 | **0.14055** | 0.14071 | 0.14119 | 0.14200 |
+
+Two other tries on a 188k-position subset are worth recording because they failed. Plain gradient
+descent with momentum, which moves a rarely seen weight more slowly than a common one, did not stop
+the full model overfitting. An L2 penalty pulling all ~800 weights towards their hand-set values
+only made the validation error worse than not tuning at all. With 3,941 games, the information is
+simply not there for 768 piece-square entries.
+
+### 8.4 What the games said
+
+The hand-set column is after the same averaging step, which is why the pawn shows 114 rather than
+100 (the pawn table averages +14).
+
+| Weight | Middlegame, hand-set | Middlegame, learned | Endgame, hand-set | Endgame, learned |
+|---|---:|---:|---:|---:|
+| Pawn | 114 | 103 | 114 | 130 |
+| Knight | 307 | 294 | 307 | 283 |
+| Bishop | 328 | 298 | 328 | 297 |
+| Rook | 500 | 443 | 500 | 466 |
+| Queen | 897 | 950 | 897 | 952 |
+| Bishop pair | 30 | 15 | 50 | 19 |
+| Doubled pawn | −15 | −13 | −15 | −20 |
+| Isolated pawn | −20 | −1 | −20 | −15 |
+| Rook, open file | 20 | 39 | 10 | −9 |
+| Rook, half-open file | 10 | 19 | 5 | 23 |
+| King file without own pawn | −30 | −10 | 0 | 43 |
+| …and without any pawn | −20 | −58 | 0 | −49 |
+| Shield pawn (king castled wide) | 10 | 12 | 0 | −18 |
+| Mobility, knight (per square) | 2 | −2 | 2 | −1 |
+| Mobility, bishop (per square) | 2 | 4 | 2 | 2 |
+| Mobility, rook (per square) | 1 | 1 | 2 | 8 |
+| Passed pawn on rank 2 | 5 | −2 | 10 | 5 |
+| Passed pawn on rank 3 | 10 | −19 | 20 | 26 |
+| Passed pawn on rank 4 | 15 | −18 | 35 | 41 |
+| Passed pawn on rank 5 | 25 | −29 | 60 | 94 |
+| Passed pawn on rank 6 | 40 | 74 | 90 | 132 |
+| Passed pawn on rank 7 | 60 | 7 | 130 | 179 |
+
+Some of this is chess knowledge the data rediscovered:
+
+- **Passed pawns** in the endgame are worth more, and grow faster with every rank, than the
+  hand-set guesses: 5, 26, 41, 94, 132, 179.
+- **The queen** is worth more than 900, and **the rook** less than 500 in the middlegame.
+- **The bishop pair** is worth less than the folklore figure at this level of play.
+
+Some of it is the data's own view and should not be read as chess truth. The middlegame passed-pawn
+values for ranks 3–5 come out negative, for example. In these games an advanced pawn in the
+middlegame is often an overextended one, and the pawn table already pays for advancing. The fit
+answers "what predicted the result of *these* games", which is the right question for this engine
+but not a general one.
+
+### 8.5 In games
+
+80 games at 300 ms a move, tuned against hand-set weights, everything else identical: **+42 =14 −24
+(61.3%), +80 Elo (95% interval +11 to +155)**. The interval excludes zero: the learned weights play
+measurably better than the hand-set ones, and the 1.1% lower prediction error turns into games won.
+
+---
+
+## 9. Where this leaves the engine
+
+### 9.1 Self-play, step by step
+
+All at 300 ms a move, 80 games (each of 40 openings with both colours), Elo from the score:
+
+| Engine | Opponent | + | = | − | Score | Elo (95% interval) | Mean depth |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Killers + history (§6) | Engine before this iteration | 34 | 22 | 24 | 56.3% | +44 (−21 to +111) | 7.05 |
+| + tapered evaluation, hand-set (§7) | Killers + history | 61 | 7 | 12 | 80.6% | +248 (+169 to +357) | 6.40 |
+| + Texel-tuned weights (§8) | Hand-set weights | 42 | 14 | 24 | 61.3% | +80 (+11 to +155) | 6.50 |
+| **Final engine** | **Engine before this iteration** | **53** | **12** | **15** | **73.8%** | **+179 (+108 to +268)** | **6.36** |
+
+The steps add up to about +370; the direct match gives +179 (95% interval +108 to +268).
+Self-play between versions of one engine exaggerates differences, which is why the calibrated
+benchmark below matters.
+
+### 9.2 Tactics
+
+The 105-position suite of §4.1, at 1 second a position, both engines run side by side in this
+session (`bench/results/tactics-1s.txt`):
+
+| Engine | Solved at 1 s | Mean depth |
+|---|---:|---:|
+| Before this iteration | 88 | 6.24 |
+| Final | **94** | 6.30 |
+
+At 1 second the final engine solves as many positions as the September engine did with 5 seconds
+(§4.1). It reaches about the same depth: the slower evaluation spends what the better ordering
+saves. So the six extra positions come from better choices at the same depth, not from searching
+deeper.
+
+### 9.3 Playing strength against Stockfish
+
+The benchmark of §5, repeated for the final engine: Stockfish 19 with `UCI_LimitStrength`, 1 second
+a move, 32 games against each of four settings (the first 16 openings, each with both colours). The
+settings are 200 points higher than September's, to bracket the stronger engine. 128 games took 56
+minutes on four cores; all are in `bench/results/elo-final.pgn`.
+
+| Opponent | Games | + | = | − | Score | Elo difference (95%) | Implied rating (95%) | FOAI mean depth |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Stockfish, UCI_Elo 1700 | 32 | 19 | 2 | 11 | 62.5% | +89 (−26 to +227) | 1789 (1674–1927) | 7.03 |
+| Stockfish, UCI_Elo 1900 | 32 | 17 | 2 | 13 | 56.3% | +44 (−73 to +172) | 1944 (1827–2072) | 7.23 |
+| Stockfish, UCI_Elo 2100 | 32 | 12 | 1 | 19 | 39.1% | −77 (−215 to +40) | 2023 (1885–2140) | 7.50 |
+| Stockfish, UCI_Elo 2300 | 32 | 14 | 3 | 15 | 48.4% | −11 (−131 to +107) | 2289 (2169–2407) | 7.31 |
+
+- **Pooled maximum-likelihood rating: 2015 ± 71** (95%). **From the two anchors that bracket it**
+  (1900 and 2100): **1982 ± 89**.
+- **The misfit of §5.3 is back, and stronger.** At 2015 the engine should score about 86%, 66%,
+  38% and 16% against the four settings; it scored 62%, 56%, 39% and 48%. The 2300 setting lost
+  half its games, three times what its rating implies. So the pooled figure depends on which
+  settings are used, and higher settings push it up.
+- **Like for like.** On the three settings both engines played (1700, 1900 and 2100), the September
+  engine rates **1730 ± 82** and the final engine **1922 ± 77: +192**. That agrees with the +179 of
+  the direct match (§9.1), which makes the gain the best-supported number in this section.
+- Colour made no difference (33½ of 64 as White, 32½ of 64 as Black). 120 of the 128 games ended in
+  checkmate. FOAI searched 7.0–7.5 plies on average, against 6.3–6.7 in September.
+
+On the same terms as §5.3, the honest statement is a range: **about 1900–2000 on Stockfish's
+limited-strength scale at 1 second a move, roughly 200 points above the September engine.**
+
+### 9.4 One bug, found by the data generator
+
+At 40 ms a move, freshly started worker threads sometimes ran out of time before depth 1 finished,
+and the engine returned no move at all. The app has the same exposure in bullet with a nearly empty
+clock: it ignores a result without a move, so the engine would sit until it lost on time. Depth 1
+now always runs to completion (a few thousand nodes at most), and a test searches with no time left
+and requires a move.
+
+---
+
+## 10. Limitations and next steps
 
 - **Quiescence ignores checks.** A leaf in check is scored by standing pat, and a quiet mate at the
   horizon is invisible. This is what forced the null-move guard; searching check evasions in
   quiescence would remove the blind spot and probably allow the lighter guard.
-- **Move ordering stops at captures.** After the hash move, captures and promotions, quiet moves are
-  searched in generation order. Killer moves and the history heuristic are the standard next step,
-  and §3 shows how much ordering is worth.
+- **The piece-square tables are still hand-set.** 3,941 games were not enough to fit their 768
+  entries without memorising games (§8.3). More games — ideally at a longer time control, where
+  results depend less on blunders — are the obvious next step; the generator and tuner are ready.
+- **The training games are the engine's own.** The weights fit the positions this engine reaches
+  and the mistakes it makes. A second round (new games with the tuned weights, then retuning) would
+  show whether the gain compounds.
+- **Self-play exaggerates.** Version-against-version gains add up to more than the direct match
+  shows (§9.1); §9.3 is the calibrated figure.
 - **No extensions.** Checks are not extended, so forcing lines are cut at the same depth as quiet
   ones.
 - **Path-dependent table entries.** A draw score stored because one line repeated can be reused on
   a path where it did not. Most engines accept this; it is bounded by clearing the table when
   contempt or side changes.
-- **The Elo figure has a scope.** One reference family, one time control, 128 games (§5.3).
+- **The Elo figures have a scope.** One reference family, one time control, 128 games each
+  (§5.3, §9.3).
 
 ---
 
-## 7. Conclusion
+## 11. Conclusion
 
-The engine is correct where it can be checked exactly — perft on every standard position, and
-alpha-beta, ordering and the table agreeing with plain minimax in every comparable search — and
-measurably better than at the start of this iteration: +93 Elo against its former self — most of
-it, on the evidence of §4.1, from null-move pruning — and about 1600–1700 on Stockfish's calibrated scale at one second a move.
+In September the engine was correct where it can be checked exactly — perft on every standard
+position, and alpha-beta, ordering and the table agreeing with plain minimax in every comparable
+search — and measurably better than at the start of that iteration: +93 Elo against its former
+self — most of it, on the evidence of §4.1, from null-move pruning — and about 1600–1700 on
+Stockfish's calibrated scale at one second a move.
 
 The experiments make the course's central point in numbers. Plain minimax pays the full branching
 factor of chess, 24–27 per ply; alpha-beta alone brings that down to 7–12, and it is move
@@ -554,13 +922,23 @@ misses a mate in two.
 Two things went wrong on the way and were caught by measurement, not by inspection: the first
 null-move guard's blind spot (a tactical position, then a self-play match to confirm the fix was
 free), and the hash keys' weak low bits (a fill rate that did not add up). Both are now pinned by
-tests. The limits of this engine are the ones in §6 — no check handling in quiescence, no quiet-
-move ordering, no extensions — and each is a known step with a known way to measure it, using the
-tools this iteration added.
+tests. The limits of the September engine were no check handling in quiescence, no quiet-move
+ordering and no extensions — each a known step with a known way to measure it.
+
+The November round took the second of those and went further, into learning. The results follow
+the course's arc: better ordering is a pure search gain (fewer nodes, same answers); a better
+evaluation is worth more than the depth it costs; and the evaluation's weights can be learned
+rather than guessed. The learning part showed the classic failure as clearly as the success. A
+model with more parameters than its data can support fits the training games better and predicts
+unseen games worse, and it took splitting by game rather than by position even to see that.
+Fitting the 44 weights the data could support turned 1.1% better predictions into +80 Elo over the
+hand-set values. Together the three changes make the engine +179 Elo stronger than in September
+in a direct match, and about 1900–2000 on Stockfish's scale, roughly 200 points up. §10 lists what
+remains.
 
 ---
 
-## 8. Reproducing this report
+## 12. Reproducing this report
 
 ```bash
 npm ci
@@ -580,7 +958,33 @@ node bench/match.js --player foai --opponents foai@../foai-before/src/engine --m
   --out bench/results/before-after.json
 node bench/match.js --player foai --opponents sf:1500,sf:1700,sf:1900,sf:2100 \
   --movetime 1000 --rounds 16 --out bench/results/elo.json --pgn bench/results/elo.pgn          # §5
+
+# November (§6–9). Each stage is a commit, so each engine can be checked out on its own:
+git worktree add ../foai-sept 73d165d               # the September engine
+git worktree add ../foai-ordering 974a8b7           # §6: + killers and history
+git worktree add ../foai-hand e0d5673               # §7: + tapered evaluation, hand-set weights
+node bench/nodes.js --depth 7 --engines "base=foai@../foai-sept/src/engine,neither=foai:killers=false:history=false,\
+killers=foai:history=false,history=foai:killers=false,both=foai"                               # §6.1
+node bench/match.js --player foai@../foai-ordering/src/engine --opponents foai@../foai-sept/src/engine \
+  --movetime 300                                                                                # §6.2
+node bench/match.js --player foai@../foai-hand/src/engine --opponents foai@../foai-ordering/src/engine \
+  --movetime 300                                                                                # §7
+node bench/weights-file.js --hand                   # §8.2: the games are played by the hand-set engine…
+node bench/datagen.js --minutes 100 --movetime 40 --workers 3   # → bench/data/selfplay.txt
+node bench/tune.js --epochs 1000 --report …         # §8.3: all weights (starts from the hand-set values)
+node bench/tune.js --epochs 1000 \
+  --only pieceValue,doubled,isolated,passed,bishopPair,rookOpen,rookSemiOpen,kingFileOpen,kingFileBare,kingShield,mobility \
+  --write --report bench/results/tuning.json        # §8: the shipped fit, written back to src/engine/weights.js
+node bench/match.js --player foai --opponents foai@../foai-hand/src/engine --movetime 300       # §8.5
+node bench/match.js --player foai --opponents foai@../foai-sept/src/engine --movetime 300       # §9.1
+node bench/suite.js --engine foai --movetime 1000                                               # §9.2 (and foai@../foai-sept/src/engine)
+node bench/match.js --player foai --opponents sf:1700,sf:1900,sf:2100,sf:2300 --movetime 1000 \
+  --rounds 16 --log elo.jsonl --out bench/results/elo-final.json --pgn bench/results/elo-final.pgn   # §9.3 (resumable)
 ```
+
+The self-play data (`bench/data/`, ~20 MB) is not committed. `bench/datagen.js` is seeded, but
+games played to a time limit depend on machine speed, so a new run produces different games of
+the same kind.
 
 | File | Contents |
 |---|---|
@@ -590,3 +994,12 @@ node bench/match.js --player foai --opponents sf:1500,sf:1700,sf:1900,sf:2100 \
 | `bench/results/null-min-depth-4-vs-3.json` | The 80 games of the guard match |
 | `bench/results/before-after.json` | The 80 games of §4.4 |
 | `bench/positions/tactics.epd` | The tactical suite, with Stockfish's score and margin for each position |
+| `bench/results/ordering-d7.json`, `ordering-d7.md` | §6.1: nodes to depth 7, five configurations, 17 positions |
+| `bench/results/ordering-vs-before.json` | §6.2: 80 games, killers and history against the September engine |
+| `bench/results/tapered-vs-ordering.json` | §7: 80 games, hand-set tapered evaluation against §6's engine |
+| `bench/results/tuning.json` | §8: the shipped fit — data, K, errors, learning curve, starting and learned weights |
+| `bench/results/tuning-candidates.json` | §8.3: the three candidate fits |
+| `bench/results/tuned-vs-hand.json` | §8.5: 80 games, learned against hand-set weights |
+| `bench/results/final-vs-before.json` | §9.1: 80 games, final engine against the September engine |
+| `bench/results/tactics-1s.txt` | §9.2: tactical suite at 1 s, both engines |
+| `bench/results/elo-final.json`, `elo-final.pgn` | §9.3: the 128 benchmark games of the final engine |

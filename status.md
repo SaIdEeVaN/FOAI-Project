@@ -164,3 +164,47 @@ both closed.
 - [x] Checked in Chromium on the production build: typed moves and errors, SAN list, contempt in the
       dialog and the side panel, game-over → board, teaching presets and FEN errors, no horizontal
       overflow at 390px
+
+
+## Killer moves, a tapered evaluation, and Texel tuning
+
+- [x] **Killer moves and the history heuristic** in the game search: hash move, MVV-LVA captures and
+      promotions, killer 1, killer 2, then quiet moves by `history[side][from][to]` (+depth² per
+      cutoff, halved past 60,000). Teaching mode's ordering left exactly as it was
+- [x] Measured with `bench/nodes.js` at depth 7 on 17 positions: with both off, node-for-node the old
+      tree (14,202,273); with both on, 8,172,405 (−42%), same best move in 17/17. Self-play vs the
+      previous engine, 80 games at 300 ms: +34 =22 −24, +44 Elo (−21 to +111)
+- [x] **Fixed:** a search could return no move when time ran out inside depth 1 (seen at 40 ms a
+      move in a cold worker; the app ignores a move-less result, so in bullet the engine would sit
+      until it lost on time). Depth 1 now always completes; pinned by a test
+- [x] **Tapered evaluation** (`evaluation.js`, `evalLayout.js`, `weights.js`): every weight has a
+      middlegame and an endgame value blended by phase (N/B 1, R 2, Q 4; max 24). New terms: passed
+      pawns by rank, bishop pair, rook on open/half-open file, mobility counted as reachable squares
+      for N, B, R. Black now reads tables with `sq ^ 56` (a mirror) instead of `63 − sq` (a rotation,
+      only right while every table was symmetric). Each term rounded towards zero on its own, so
+      the breakdown still sums exactly and mirrored positions negate exactly
+- [x] Teaching mode's breakdown shows the game phase it blended at
+- [x] Hand-set tapered evaluation vs the killers/history engine: +61 =7 −12 (80.6%), +248 Elo
+      (+169 to +357), at 12% fewer nodes per second
+- [x] **Texel tuning.** `Evaluation.features()` gives each position as sparse pattern counts; a test
+      checks that features × weights reproduces `evaluate()` on 407 positions. `bench/datagen.js`:
+      self-play at 40 ms, random openings, quiet positions only, labelled with the game result.
+      3,941 games / 257,691 positions in ~100 min on three cores (`bench/data/`, not committed).
+      `bench/tune.js`: fit K, then full-batch Adam on the mean squared error, whole games held out
+      for validation (early stopping, model choice) and test (reported only)
+- [x] **Overfitting, found and handled.** A split by position made the fit look good; a split by game
+      showed it memorising games. Fitting all ~800 weights, or adding L2 towards the hand-set values,
+      or plain gradient descent, all generalised worse than fitting the 44 scalar weights alone and
+      keeping the hand-set piece-square tables. Test error 0.14098 → 0.13946
+- [x] Tuned vs hand-set weights: +42 =14 −24 (61.3%), +80 Elo (+11 to +155)
+- [x] Final engine vs the engine this iteration started from: +53 =12 −15 (73.8%), +179 Elo
+      (+108 to +268); the steps add up to ~+370, the usual self-play inflation
+- [x] Tactical suite at 1 s: 94/105 against 88/105 for the previous engine, at the same
+      depth (6.30 vs 6.24)
+- [x] Stockfish benchmark at 1 s, anchors 1700/1900/2100/2300 (32 games each): pooled 2015 ± 71,
+      1982 ± 89 from the bracketing pair. Same misfit as September (the 2300 setting scored 48%).
+      Like for like on 1700/1900/2100: September 1730 ± 82, final 1922 ± 77, +192
+- [x] **Interrupted once**: the container restarted 26 games into the Stockfish run, and match.js
+      only saved at the end. It now takes `--log games.jsonl`, appends each game as it finishes, and
+      skips logged games when restarted
+- [x] REPORT.md §6–9, PRD (evaluation spec, gaps, milestones 13–15), README

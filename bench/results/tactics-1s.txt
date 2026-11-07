@@ -1,0 +1,2 @@
+foai@<engine before this iteration> 1000 ms  solved 88/105 (material 87/104, mate 1/1)  mean depth 6.24
+foai (final) 1000 ms  solved 94/105 (material 93/104, mate 1/1)  mean depth 6.30
