@@ -1,0 +1,82 @@
+{
+ "note": "Candidate fits on the full data set (bench/data/selfplay.txt, 257,691 positions, 3,941 games). Chosen by validation error; test error never used for a choice.",
+ "candidates": [
+  {
+   "name": "Scalars only (shipped)",
+   "only": [
+    "pieceValue",
+    "doubled",
+    "isolated",
+    "passed",
+    "bishopPair",
+    "rookOpen",
+    "rookSemiOpen",
+    "kingFileOpen",
+    "kingFileBare",
+    "kingShield",
+    "mobility"
+   ],
+   "l2": 0,
+   "optimizer": "adam",
+   "lr": 0.5,
+   "bestEpoch": 125,
+   "before": {
+    "train": 0.13836588365988858,
+    "validation": 0.14290101134513902,
+    "test": 0.1409846427107443
+   },
+   "after": {
+    "train": 0.13584551779537188,
+    "validation": 0.14047885304409785,
+    "test": 0.13945579630360733
+   }
+  },
+  {
+   "name": "Scalars only, L2 1e-6",
+   "only": [
+    "pieceValue",
+    "doubled",
+    "isolated",
+    "passed",
+    "bishopPair",
+    "rookOpen",
+    "rookSemiOpen",
+    "kingFileOpen",
+    "kingFileBare",
+    "kingShield",
+    "mobility"
+   ],
+   "l2": 0.000001,
+   "optimizer": "adam",
+   "lr": 0.5,
+   "bestEpoch": 25,
+   "before": {
+    "train": 0.13836588365988858,
+    "validation": 0.14290101134513902,
+    "test": 0.1409846427107443
+   },
+   "after": {
+    "train": 0.13738072066439483,
+    "validation": 0.14195786078783257,
+    "test": 0.14040046353438107
+   }
+  },
+  {
+   "name": "All ~800 weights",
+   "l2": 0,
+   "optimizer": "adam",
+   "lr": 0.5,
+   "bestEpoch": 25,
+   "before": {
+    "train": 0.13836588365988858,
+    "validation": 0.14290101134513902,
+    "test": 0.1409846427107443
+   },
+   "after": {
+    "train": 0.13458918685404084,
+    "validation": 0.14083035142788394,
+    "test": 0.13991548665332917
+   }
+  }
+ ]
+}

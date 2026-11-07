@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Self-play positions for bench/tune.js (regenerate with bench/datagen.js)
+bench/data/
