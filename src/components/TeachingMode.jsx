@@ -285,6 +285,10 @@ function EvalBreakdown({ breakdown }) {
         <span />
         <span className="tm-eval-val">{fmtPawns(breakdown.total)}</span>
       </div>
+      <p className="tm-note">
+        Game phase {breakdown.phase}/24: every term is {Math.round((breakdown.phase / 24) * 100)}% its middlegame
+        weight and {100 - Math.round((breakdown.phase / 24) * 100)}% its endgame weight.
+      </p>
     </div>
   );
 }
